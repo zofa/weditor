@@ -19,12 +19,11 @@ import java.util.List;
 public class WeditorApplication extends Application {
 
 
-    protected String inFileDir,outFileDir;
-
     /**
      *
      */
     private static final long serialVersionUID = 3601221463880485916L;
+    protected String inFileDir, outFileDir;
 
     @Override
     public void init() {
@@ -40,9 +39,9 @@ public class WeditorApplication extends Application {
         table.setWidth("60%");
 
 		/* Add a few items in the table. */
-        table.addItem(new Object[]{"Nicolaus", "asdf", "asads", "Link"});
 
-        table.setColumnFooter(table.firstItemId(),"2");
+
+        table.setColumnFooter(table.firstItemId(), "2");
 
         table.setFooterVisible(true);
 
@@ -60,10 +59,12 @@ public class WeditorApplication extends Application {
             }
 
             if (!files.isEmpty()) {
-                for (String string : files) {
-                    mainWindow.addComponent(new Label(string));
-                    List<String> theDealers = this.getDealersList(string);
-                    theDealers.toString();
+                for (int i=0; i< files.size();i++) {
+                    //mainWindow.addComponent(new Label(files.get(i)));
+
+                    String theDealers = this.getDealersList(files.get(i)).toString();
+
+                    table.addItem(new Object[]{files.get(i), "", theDealers, "Link"}, new Integer(i));
                 }
             }
         } else {
@@ -71,13 +72,11 @@ public class WeditorApplication extends Application {
         }
 
 
-
         Table processingTable = new Table("List of files on re-processing queue.");
-
         processingTable.addContainerProperty("File name", String.class, null);
         processingTable.addContainerProperty("Moved at", String.class, null);
 
-        processingTable.addItem(new Object[]{"Nicolaus", "asdfasdf"});
+        processingTable.addItem(new Object[]{"Nicolaus", "asdfasdf"}, new Integer(1));
 
         processingTable.setWidth("60%");
         mainWindow.addComponent(processingTable);
@@ -137,12 +136,10 @@ public class WeditorApplication extends Application {
 
     }
 
-    protected void moveFile(String fileName){
-
+    protected void moveFile(String fileName) {
 
 
     }
-
 
 
 }
