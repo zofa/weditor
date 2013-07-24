@@ -3,27 +3,23 @@
  */
 package com.kraususa;
 
-import java.awt.Panel;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.vaadin.Application;
-import com.vaadin.ui.*;
-//import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Main application class.
  */
 public class WeditorApplication extends Application {
+
+
+    protected String inFileDir,outFileDir;
 
     /**
      *
@@ -37,18 +33,22 @@ public class WeditorApplication extends Application {
         Table table = new Table("List of error files");
 
         table.addContainerProperty("File name", String.class, null);
-        table.addContainerProperty("Arrived at", Date.class, null);
+        table.addContainerProperty("Arrived at", String.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
         table.addContainerProperty("Action", String.class, null);
 
-		/* Add a few items in the table. */
-        table.addItem(new Object[]{"Nicolaus", new Date(), "asads", "Link"
+        table.setWidth("60%");
 
-        });
+		/* Add a few items in the table. */
+        table.addItem(new Object[]{"Nicolaus", "asdf", "asads", "Link"});
+
+        table.setColumnFooter(table.firstItemId(),"2");
+
+        table.setFooterVisible(true);
 
         mainWindow.addComponent(table);
 
-        List<String> files = new ArrayList<String>();
+        List<String> files = new ArrayList<String>(10);
 
         if (files != null) {
 
@@ -62,15 +62,28 @@ public class WeditorApplication extends Application {
             if (!files.isEmpty()) {
                 for (String string : files) {
                     mainWindow.addComponent(new Label(string));
-
+                    List<String> theDealers = this.getDealersList(string);
+                    theDealers.toString();
                 }
             }
         } else {
             mainWindow.showNotification("Error", "Cannot obtain file list");
-
         }
 
+
+
+        Table processingTable = new Table("List of files on re-processing queue.");
+
+        processingTable.addContainerProperty("File name", String.class, null);
+        processingTable.addContainerProperty("Moved at", String.class, null);
+
+        processingTable.addItem(new Object[]{"Nicolaus", "asdfasdf"});
+
+        processingTable.setWidth("60%");
+        mainWindow.addComponent(processingTable);
+
         setMainWindow(mainWindow);
+
     }
 
     protected List<String> listFiles(String path) throws IOException {
@@ -93,29 +106,18 @@ public class WeditorApplication extends Application {
         List<String> dealers = new ArrayList<String>(5);
 
         BufferedReader br = null;
-        String line = "";
-        String cvsSplitBy = "|";
+        String line;
+        String splitter = "\\|";
 
         try {
-
-            Map<String, String> maps = new HashMap<String, String>();
-
             br = new BufferedReader(new FileReader(file));
             while ((line = br.readLine()) != null) {
-
-                // use comma as separator
-                String[] country = line.split(cvsSplitBy);
-
-                maps.put(country[4], country[5]);
-
-            }
-
-            // loop map
-            for (Map.Entry<String, String> entry : maps.entrySet()) {
-
-                System.out.println("Country [code= " + entry.getKey()
-                        + " , name=" + entry.getValue() + "]");
-
+                String[] tmp = line.split(splitter);
+                try {
+                    dealers.add(tmp[6]);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    ;
+                }
             }
 
         } catch (FileNotFoundException e) {
@@ -131,9 +133,16 @@ public class WeditorApplication extends Application {
                 }
             }
         }
-
-        return null;
+        return dealers;
 
     }
+
+    protected void moveFile(String fileName){
+
+
+
+    }
+
+
 
 }
