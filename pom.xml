@@ -109,7 +109,7 @@
 				<configuration>
 					<url>http://dev-web:8080/manager</url>
 					<server>dev-web</server>
-					<path>/weditor</path>
+					<!-- <path>/weditor</path> -->
 				</configuration>
 			</plugin>
 
