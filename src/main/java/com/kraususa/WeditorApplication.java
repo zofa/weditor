@@ -1,105 +1,139 @@
 /**
- * 
+ *
  */
 package com.kraususa;
 
 import java.awt.Panel;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.vaadin.Application;
 import com.vaadin.ui.*;
 //import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickEvent;
 
-
 /**
  * Main application class.
  */
-public class WeditorApplication  extends Application {
+public class WeditorApplication extends Application {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3601221463880485916L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3601221463880485916L;
 
-	@Override
-	public void init() {
-		final Window mainWindow = new Window("Weditor app");
-		
-		
+    @Override
+    public void init() {
+        final Window mainWindow = new Window("Weditor app");
 
-		Table table = new Table("This is my Table");
+        Table table = new Table("List of error files");
 
-		/* Define the names and data types of columns.
-		 * The "default value" parameter is meaningless here. */
-		table.addContainerProperty("First Name", String.class,  null);
-		table.addContainerProperty("Last Name",  String.class,  null);
-		table.addContainerProperty("Year",       Integer.class, null);
+        table.addContainerProperty("File name", String.class, null);
+        table.addContainerProperty("Arrived at", Date.class, null);
+        table.addContainerProperty("Dealer list", String.class, null);
+        table.addContainerProperty("Action", String.class, null);
 
 		/* Add a few items in the table. */
-		table.addItem(new Object[] {
-		    "Nicolaus","Copernicus",new Integer(1473)}, new Integer(1));
-		table.addItem(new Object[] {
-		    "Tycho",   "Brahe",     new Integer(1546)}, new Integer(2));
-		table.addItem(new Object[] {
-		    "Giordano","Bruno",     new Integer(1548)}, new Integer(3));
-		table.addItem(new Object[] {
-		    "Galileo", "Galilei",   new Integer(1564)}, new Integer(4));
-		table.addItem(new Object[] {
-		    "Johannes","Kepler",    new Integer(1571)}, new Integer(5));
-		table.addItem(new Object[] {
-		    "Isaac",   "Newton",    new Integer(1643)}, new Integer(6));
-		
-		 
-		mainWindow.addComponent(table);
-		mainWindow.addComponent(new Label("asdfasdf"));
-		
-		
-		List<String> files = new ArrayList<String>();
+        table.addItem(new Object[]{"Nicolaus", new Date(), "asads", "Link"
 
-		if (files != null) {
-			
-			try {				
-				files.addAll(this.listFiles("/infiles/"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				mainWindow.addComponent(new Label(e.getMessage()));
-			}
+        });
 
-			if (!files.isEmpty()) {
-				for (String string : files) {
-					mainWindow.addComponent(new Label(string));
+        mainWindow.addComponent(table);
 
-				}
-			}
-		} else {
-			mainWindow.showNotification("This is the caption",
-					"This is the description");
-			
-		}
-		
-		
-		setMainWindow(mainWindow);
-	}
+        List<String> files = new ArrayList<String>();
 
-	protected List<String> listFiles(String path) throws IOException {
+        if (files != null) {
 
-		File root = new File(path);
-		File[] list = root.listFiles();
+            try {
+                files.addAll(this.listFiles("/infiles/"));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
-		List<String> fileList = new ArrayList<String>();
+            if (!files.isEmpty()) {
+                for (String string : files) {
+                    mainWindow.addComponent(new Label(string));
 
-		
-		for (File f : list) {
-			System.out.println("File:" + f.getAbsolutePath());
-			fileList.add(f.getAbsolutePath());
-		}
+                }
+            }
+        } else {
+            mainWindow.showNotification("Error", "Cannot obtain file list");
 
-		return fileList;
-	}
+        }
+
+        setMainWindow(mainWindow);
+    }
+
+    protected List<String> listFiles(String path) throws IOException {
+
+        File root = new File(path);
+        File[] list = root.listFiles();
+
+        List<String> fileList = new ArrayList<String>();
+
+        for (File f : list) {
+            System.out.println("File:" + f.getAbsolutePath());
+            fileList.add(f.getAbsolutePath());
+        }
+
+        return fileList;
+    }
+
+    protected List<String> getDealersList(String file) {
+
+        List<String> dealers = new ArrayList<String>(5);
+
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = "|";
+
+        try {
+
+            Map<String, String> maps = new HashMap<String, String>();
+
+            br = new BufferedReader(new FileReader(file));
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] country = line.split(cvsSplitBy);
+
+                maps.put(country[4], country[5]);
+
+            }
+
+            // loop map
+            for (Map.Entry<String, String> entry : maps.entrySet()) {
+
+                System.out.println("Country [code= " + entry.getKey()
+                        + " , name=" + entry.getValue() + "]");
+
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
+
+    }
 
 }
