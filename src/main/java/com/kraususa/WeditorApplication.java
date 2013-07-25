@@ -4,9 +4,10 @@
 package com.kraususa;
 
 import com.vaadin.Application;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.FilesystemContainer;
+import com.vaadin.ui.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,64 +24,98 @@ public class WeditorApplication extends Application {
      *
      */
     private static final long serialVersionUID = 3601221463880485916L;
-    protected String inFileDir, outFileDir;
+    protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
 
+    private Table table;
     @Override
     public void init() {
         final Window mainWindow = new Window("Weditor app");
 
-        Table table = new Table("List of error files");
-
+        HorizontalLayout hLayout = new HorizontalLayout();
+        VerticalLayout verticalLayout = new VerticalLayout();
+        // -------------------------------------------------------------------------------------------------------------
+        table = new Table("List of error files");
         table.addContainerProperty("File name", String.class, null);
+        table.addContainerProperty("# of records", Integer.class, null);
         table.addContainerProperty("Arrived at", String.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
-        table.addContainerProperty("Action", String.class, null);
-
-        table.setWidth("60%");
-
-		/* Add a few items in the table. */
-
-
+        table.addContainerProperty("Action", NativeButton.class, null);
+        table.setWidth("50%");
         table.setColumnFooter(table.firstItemId(), "2");
-
-        table.setFooterVisible(true);
-
-        mainWindow.addComponent(table);
+        table.setFooterVisible(true); table.setSelectable(true); table.setSizeFull();
+        table.setImmediate(true);
+        table.setColumnCollapsingAllowed(true);
 
         List<String> files = new ArrayList<String>(10);
 
         if (files != null) {
 
             try {
-                files.addAll(this.listFiles("/infiles/"));
+                files.addAll(this.listFiles(inFileDir));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
             if (!files.isEmpty()) {
-                for (int i=0; i< files.size();i++) {
-                    //mainWindow.addComponent(new Label(files.get(i)));
-
-                    String theDealers = this.getDealersList(files.get(i)).toString();
-
-                    table.addItem(new Object[]{files.get(i), "", theDealers, "Link"}, new Integer(i));
+                for (int i = 0; i < files.size(); i++) {
+                    String theDealers = this.getDealersList(inFileDir+files.get(i)).toString();
+                    table.addItem(new Object[]
+                            {
+                                    files.get(i),
+                                 this.getDealersList(files.get(i)).size(),
+                                 "",
+                                 theDealers,
+                                 "Fix & sumbit"
+                            }, new Integer(i));
                 }
             }
         } else {
             mainWindow.showNotification("Error", "Cannot obtain file list");
         }
 
+        final Label current = new Label("Selected: -");
+        table.addListener(new Property.ValueChangeListener() {
+            public void valueChange(Property.ValueChangeEvent event) {
 
-        Table processingTable = new Table("List of files on re-processing queue.");
-        processingTable.addContainerProperty("File name", String.class, null);
-        processingTable.addContainerProperty("Moved at", String.class, null);
+                //Item item  = table.getItem();
+               // current.setValue("Selected: " + item.getItemProperty();
 
-        processingTable.addItem(new Object[]{"Nicolaus", "asdfasdf"}, new Integer(1));
+            }
+        });
+        // -------------------------------------------------------------------------------------------------------------
+        FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
+        Table processingTable = new Table("Re-processing queue",fc);
+        processingTable.setSizeFull();
+        processingTable.setSelectable(true);
 
-        processingTable.setWidth("60%");
-        mainWindow.addComponent(processingTable);
+        // -------------------------------------------------------------------------------------------------------------
+        TextArea fileEditor = new com.vaadin.ui.TextArea("File Editor");
+        fileEditor.setWidth("50%");
+        fileEditor.setRows(20);
+        fileEditor.setColumns(40);
+        fileEditor.setSizeFull();
+        //fileEditor.addListener();
+        fileEditor.setImmediate(true);
+        fileEditor.setWordwrap(true);
 
+        // -------------------------------------------------------------------------------------------------------------
+        HorizontalSplitPanel split = new HorizontalSplitPanel();
+        split.addComponent(table);
+        VerticalLayout v = new VerticalLayout();
+        v.addComponent(fileEditor);
+        Button saveButton = new Button("Save");
+        v.addComponent(saveButton);
+        v.setComponentAlignment(saveButton, Alignment.BOTTOM_RIGHT);
+        v.addComponent(current);
+        split.addComponent(v);
+
+        verticalLayout.addComponent(split);
+        verticalLayout.addComponent(processingTable);
+        verticalLayout.setMargin(true);
+        verticalLayout.setWidth("80%");
+        verticalLayout.setHeight("80%");
+        mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
 
     }
@@ -93,10 +128,9 @@ public class WeditorApplication extends Application {
         List<String> fileList = new ArrayList<String>();
 
         for (File f : list) {
-            System.out.println("File:" + f.getAbsolutePath());
-            fileList.add(f.getAbsolutePath());
+            System.out.println("File:" + f.getName());
+            fileList.add(f.getName());
         }
-
         return fileList;
     }
 
@@ -115,7 +149,7 @@ public class WeditorApplication extends Application {
                 try {
                     dealers.add(tmp[6]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    ;
+
                 }
             }
 
@@ -137,7 +171,6 @@ public class WeditorApplication extends Application {
     }
 
     protected void moveFile(String fileName) {
-
 
     }
 
