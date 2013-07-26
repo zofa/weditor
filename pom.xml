@@ -10,8 +10,12 @@
 
     <url>http://dev-web:8080/weditor</url>
     <organization>
-        <name>kraususa</name>
+        <name></name>
     </organization>
+
+    <prerequisites>
+        <maven>${maven.min-version}</maven>
+    </prerequisites>
 
     <!--***********************************************************-->
 
@@ -20,6 +24,7 @@
         <vaadin.version>6.8.2</vaadin.version>
         <gwt.version>2.3.0</gwt.version>
         <gwt.plugin.version>2.2.0</gwt.plugin.version>
+        <maven.min-version>3.1.0</maven.min-version>
     </properties>
 
     <build>
@@ -189,11 +194,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin</artifactId>
-            <version>6.8.2</version>
         </dependency>
 
     </dependencies>
