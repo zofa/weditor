@@ -16,6 +16,12 @@
             <param-name>application</param-name>
             <param-value>com.kraususa.WeditorApplication</param-value>
         </init-param>
+
+        <init-param>
+            <param-name>log4j-properties-location</param-name>
+            <param-value>WEB-INF/log4j.properties</param-value>
+        </init-param>
+
     </servlet>
 
     <servlet-mapping>
@@ -27,7 +33,7 @@
     <!--expiting session when no interactionperformed-->
 
     <session-config>
-        <session-timeout>1000</session-timeout>
+        <session-timeout>5000</session-timeout>
     </session-config>
 
 </web-app>

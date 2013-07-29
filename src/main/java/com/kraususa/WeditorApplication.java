@@ -8,6 +8,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,11 +22,11 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class WeditorApplication extends Application {
 
-
     /**
      *
      */
     private static final long serialVersionUID = 3601221463880485916L;
+    private static Logger logger = Logger.getLogger(WeditorApplication.class);
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
@@ -35,8 +36,17 @@ public class WeditorApplication extends Application {
     public void init() {
         final Window mainWindow = new Window("Weditor app");
 
+        mainWindow.addListener(new Window.CloseListener() {
+            @Override
+            public void windowClose(Window.CloseEvent e) {
+                logger.info("User refreshes the page..reloading components.");
+                getMainWindow().getApplication().close();
+            }
+        });
+
         HorizontalLayout hLayout = new HorizontalLayout();
         VerticalLayout verticalLayout = new VerticalLayout();
+        logger.info("Initializing the application.");
         // -------------------------------------------------------------------------------------------------------------
         table = new Table("List of error files");
         table.addContainerProperty("File name", String.class, null);
@@ -58,7 +68,6 @@ public class WeditorApplication extends Application {
         if (files != null) {
 
             files.addAll(this.listFiles(inFileDir));
-
 
             if (!files.isEmpty()) {
                 for (int i = 0; i < files.size(); i++) {
@@ -100,6 +109,7 @@ public class WeditorApplication extends Application {
                         line = br.readLine();
                     }
                     fileEditor.setValue(sb.toString());
+                    logger.info("Saved content to file.");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,8 +144,10 @@ public class WeditorApplication extends Application {
         saveAndMoveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                logger.info("Saving with no file move.");
                 doSave(false);
                 getMainWindow().getApplication().close();
+                logger.info("Saving with no file move.");
             }
         });
 
@@ -148,8 +160,10 @@ public class WeditorApplication extends Application {
         saveAndMoveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                logger.info("Saving moving file...");
                 doSave(true);
                 getMainWindow().getApplication().close();
+                logger.info("File moved - reloading application UI");
             }
         });
         v.addComponent(fileEditor);
@@ -168,6 +182,8 @@ public class WeditorApplication extends Application {
     }
 
     protected List<String> listFiles(String path) {
+
+        logger.info("Listing directory " + path);
 
         File root = new File(path);
         File[] list = root.listFiles();
@@ -235,6 +251,7 @@ public class WeditorApplication extends Application {
                 FileWriter fw = new FileWriter(selectedFile, false);
                 fw.append((String) fileEditor.getValue());
                 fw.close();
+                status = "Changes saved.";
                 if (move)
                     moveFile(selectedFile);
             } catch (IOException e) {

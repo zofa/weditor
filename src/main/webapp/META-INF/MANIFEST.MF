@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
 Class-Path: vaadin-6.8.2.jar googleanalyticstracker-2.0.0.jar guava-14
- .0.1.jar
+ .0.1.jar refresher-1.1.1.jar commons-io-1.3.2.jar commons-io-2.4.jar 
+ log4j-1.2.17.jar
 
