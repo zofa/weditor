@@ -145,7 +145,6 @@
                 <configuration>
                     <url>http://dev-web:8080/manager</url>
                     <server>dev-web</server>
-                    <!-- <path>/weditor</path> -->
                 </configuration>
             </plugin>
 
@@ -166,13 +165,13 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.4.1</version>
-                <configuration>
-                    <!--
+              <!--  <configuration>
+                    &lt;!&ndash;
                       During release:perform, enable the "release" profile
-                     -->
+                     &ndash;&gt;
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy assembly:single</goals>
-                </configuration>
+                </configuration>-->
             </plugin>
         </plugins>
     </build>
