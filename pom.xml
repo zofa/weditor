@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
@@ -9,7 +10,7 @@
 
     <url>http://dev-web:8080/weditor</url>
     <organization>
-        <name />
+        <name/>
     </organization>
 
     <prerequisites>
@@ -31,14 +32,20 @@
         <connection>scm:git:git@github.com:zofa/weditor.git</connection>
         <url>scm:git:git@github.com:zofa/weditor.git</url>
         <developerConnection>scm:git:git@github.com:zofa/weditor.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <distributionManagement>
         <repository>
-            <id>maven-repository</id>
-            <url>${github.maven.repository}</url>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://dev-web:8081/nexus/content/repositories/releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://dev-web:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
