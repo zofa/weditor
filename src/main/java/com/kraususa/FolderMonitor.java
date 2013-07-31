@@ -14,7 +14,7 @@ import java.io.File;
  * Date: 7/29/13
  * Time: 12:25 PM
  * The class has to provide monitoring of the folder for deletion and creation of new files.
- * TO be used for checking the input and output folders.
+ * TO be used for checking the input and output folders and mailing  errors
  */
 public class FolderMonitor {
 

@@ -6,13 +6,17 @@ package com.kraususa;
 import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.FilesystemContainer;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -27,9 +31,11 @@ public class WeditorApplication extends Application {
      */
     private static final long serialVersionUID = 3601221463880485916L;
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
+    private final String fileFilter = "*.err";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
+    private Button saveAndMoveButton, saveButton;
     private String selectedFile = null;
 
     @Override
@@ -109,10 +115,11 @@ public class WeditorApplication extends Application {
                         line = br.readLine();
                     }
                     fileEditor.setValue(sb.toString());
-                    logger.info("Saved content to file.");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                saveButton.setEnabled(false);
+                saveAndMoveButton.setEnabled(false);
             }
         });
         // -------------------------------------------------------------------------------------------------------------
@@ -128,9 +135,16 @@ public class WeditorApplication extends Application {
         fileEditor.setWordwrap(false);
         fileEditor.setColumns(40);
         fileEditor.setSizeFull();
-        //fileEditor.addListener();
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
+        FieldEvents.TextChangeListener inputEventListener = new FieldEvents.TextChangeListener() {
+            @Override
+            public void textChange(FieldEvents.TextChangeEvent event) {
+                saveAndMoveButton.setEnabled(true);
+                saveButton.setEnabled(true);
+            }
+        };
+        fileEditor.addListener(inputEventListener);
 
         // -------------------------------------------------------------------------------------------------------------
         HorizontalSplitPanel split = new HorizontalSplitPanel();
@@ -139,14 +153,18 @@ public class WeditorApplication extends Application {
         VerticalLayout v = new VerticalLayout();
         HorizontalLayout h = new HorizontalLayout();
 
-        Button saveAndMoveButton = new Button("Save and Move");
-        Button saveButton = new Button("Save changes");
-        saveAndMoveButton.addListener(new Button.ClickListener() {
+        saveAndMoveButton = new Button("Save and Move");
+        saveAndMoveButton.setEnabled(false);
+        saveButton = new Button("Save changes");
+        saveButton.setEnabled(false);
+
+        saveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 logger.info("Saving with no file move.");
                 doSave(false);
                 getMainWindow().getApplication().close();
+                getMainWindow().showNotification("Changes saved to file");
                 logger.info("Saving with no file move.");
             }
         });
@@ -186,7 +204,8 @@ public class WeditorApplication extends Application {
         logger.info("Listing directory " + path);
 
         File root = new File(path);
-        File[] list = root.listFiles();
+        FileFilter ff = new WildcardFileFilter(fileFilter);
+        File[] list = root.listFiles(ff);
 
         List<String> fileList = new ArrayList<String>();
 
@@ -197,9 +216,9 @@ public class WeditorApplication extends Application {
         return fileList;
     }
 
-    protected List<String> getDealersList(String file) {
+    protected Set<String> getDealersList(String file) {
 
-        List<String> dealers = new ArrayList<String>(5);
+        Set<String> dealers = new HashSet<String>();
 
         BufferedReader br = null;
         String line;
@@ -210,7 +229,8 @@ public class WeditorApplication extends Application {
             while ((line = br.readLine()) != null) {
                 String[] tmp = line.split(splitter);
                 try {
-                    dealers.add(tmp[6]);
+                    if (!isNullOrEmpty(tmp[6]))
+                        dealers.add(tmp[6]);
                 } catch (ArrayIndexOutOfBoundsException e) {
 
                 }
