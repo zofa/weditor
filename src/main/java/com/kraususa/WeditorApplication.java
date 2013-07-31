@@ -3,6 +3,7 @@
  */
 package com.kraususa;
 
+
 import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.FilesystemContainer;
@@ -35,7 +36,8 @@ public class WeditorApplication extends Application {
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
-    private Button saveAndMoveButton, saveButton;
+    private Label topLabel;
+    private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
 
     @Override
@@ -55,10 +57,12 @@ public class WeditorApplication extends Application {
         logger.info("Initializing the application.");
         // -------------------------------------------------------------------------------------------------------------
         table = new Table("List of error files");
+        table.setCaption("Error file editor");
         table.addContainerProperty("File name", String.class, null);
         table.addContainerProperty("# of records", Integer.class, null);
         //table.addContainerProperty("Arrived at", String.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
+        table.addContainerProperty("Errors", String.class, null);
         // table.addContainerProperty("Action", NativeButton.class, null);
         table.setWidth("30%");
         table.setColumnFooter(table.firstItemId(), "2");
@@ -85,6 +89,7 @@ public class WeditorApplication extends Application {
                                     //  "",
                                     theDealers,
                                     // "Fix & sumbit"
+                                    "Error type goes here"
                             }, new Integer(i));
                 }
             }
@@ -98,30 +103,35 @@ public class WeditorApplication extends Application {
         final Label current = new Label("Selected: -");
         table.addListener(new Property.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
-                current.setValue("Selected: " + table.getValue());
-                Object rowId = event.getProperty().getValue();
+                if (table.getValue() != null) {
+                    current.setValue("Selected: " + table.getValue());
+                    Object rowId = event.getProperty().getValue();
+                    BufferedReader br = null;
 
-                BufferedReader br = null;
+                    try {
+                        selectedFile = inFileDir + (String) table.getContainerProperty(rowId, "File name").getValue();
+                        br = new BufferedReader(new FileReader(selectedFile));
+                        StringBuilder sb = new StringBuilder();
+                        String line = br.readLine();
 
-                try {
-                    selectedFile = inFileDir + (String) table.getContainerProperty(rowId, "File name").getValue();
-                    br = new BufferedReader(new FileReader(selectedFile));
-                    StringBuilder sb = new StringBuilder();
-                    String line = br.readLine();
-
-                    while (line != null) {
-                        sb.append(line);
-                        sb.append("\n");
-                        line = br.readLine();
+                        while (line != null) {
+                            sb.append(line);
+                            sb.append("\n");
+                            line = br.readLine();
+                        }
+                        fileEditor.setValue(sb.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    fileEditor.setValue(sb.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    saveButton.setEnabled(false);
+                    saveAndMoveButton.setEnabled(false);
+                    fixButton.setEnabled(true);
+                } else {
+                    fixButton.setEnabled(false);
                 }
-                saveButton.setEnabled(false);
-                saveAndMoveButton.setEnabled(false);
             }
         });
+
         // -------------------------------------------------------------------------------------------------------------
         FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
         Table processingTable = new Table("Re-processing queue", fc);
@@ -137,13 +147,14 @@ public class WeditorApplication extends Application {
         fileEditor.setSizeFull();
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
-        FieldEvents.TextChangeListener inputEventListener = new FieldEvents.TextChangeListener() {
-            @Override
-            public void textChange(FieldEvents.TextChangeEvent event) {
-                saveAndMoveButton.setEnabled(true);
-                saveButton.setEnabled(true);
-            }
-        };
+        FieldEvents.TextChangeListener inputEventListener = new
+                FieldEvents.TextChangeListener() {
+                    @Override
+                    public void textChange(FieldEvents.TextChangeEvent event) {
+                        saveAndMoveButton.setEnabled(true);
+                        saveButton.setEnabled(true);
+                    }
+                };
         fileEditor.addListener(inputEventListener);
 
         // -------------------------------------------------------------------------------------------------------------
@@ -153,9 +164,9 @@ public class WeditorApplication extends Application {
         VerticalLayout v = new VerticalLayout();
         HorizontalLayout h = new HorizontalLayout();
 
-        saveAndMoveButton = new Button("Save and Move");
+        saveAndMoveButton = new Button("Save changes and move file");
         saveAndMoveButton.setEnabled(false);
-        saveButton = new Button("Save changes");
+        saveButton = new Button("Save changes to file");
         saveButton.setEnabled(false);
 
         saveButton.addListener(new Button.ClickListener() {
@@ -165,12 +176,22 @@ public class WeditorApplication extends Application {
                 doSave(false);
                 getMainWindow().getApplication().close();
                 getMainWindow().showNotification("Changes saved to file");
-                logger.info("Saving with no file move.");
+                logger.info("File changes saved.");
+            }
+        });
+
+        fixButton = new Button("Fix selected");
+        fixButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getMainWindow().showNotification("TODO:To be implemented");
+                logger.info("Trying to fix file..");
             }
         });
 
         h.addComponent(saveButton);
         h.addComponent(saveAndMoveButton);
+        h.addComponent(fixButton);
 
         v.addComponent(h);
         //v.setComponentAlignment(saveAndMoveButton, Alignment.BOTTOM_RIGHT);
@@ -178,7 +199,7 @@ public class WeditorApplication extends Application {
         saveAndMoveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                logger.info("Saving moving file...");
+                logger.info("Saving and moving file...");
                 doSave(true);
                 getMainWindow().getApplication().close();
                 logger.info("File moved - reloading application UI");
@@ -187,7 +208,10 @@ public class WeditorApplication extends Application {
         v.addComponent(fileEditor);
         v.addComponent(current);
         split.addComponent(v);
+        split.setHeight("80%");
 
+
+        //verticalLayout.addComponent(topLabel);
         verticalLayout.addComponent(split);
         verticalLayout.addComponent(processingTable);
         verticalLayout.setMargin(true);
@@ -196,7 +220,6 @@ public class WeditorApplication extends Application {
 
         mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
-
     }
 
     protected List<String> listFiles(String path) {
@@ -226,7 +249,7 @@ public class WeditorApplication extends Application {
 
         try {
             br = new BufferedReader(new FileReader(file));
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null && line.startsWith("H")) {
                 String[] tmp = line.split(splitter);
                 try {
                     if (!isNullOrEmpty(tmp[6]))
@@ -282,5 +305,11 @@ public class WeditorApplication extends Application {
             status = "Nothing to save";
         }
         return status;
+    }
+
+
+    private void fixEntry() {
+
+
     }
 }
