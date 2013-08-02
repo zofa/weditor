@@ -10,6 +10,8 @@ import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import data.Order;
+import data.OrderEntry;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 
@@ -89,7 +91,7 @@ public class WeditorApplication extends Application {
                                     //  "",
                                     theDealers,
                                     // "Fix & sumbit"
-                                    "Error type goes here"
+                                    validateFile(inFileDir + files.get(i))
                             }, new Integer(i));
                 }
             }
@@ -148,6 +150,7 @@ public class WeditorApplication extends Application {
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
         FieldEvents.TextChangeListener inputEventListener = new
+
                 FieldEvents.TextChangeListener() {
                     @Override
                     public void textChange(FieldEvents.TextChangeEvent event) {
@@ -273,7 +276,6 @@ public class WeditorApplication extends Application {
             }
         }
         return dealers;
-
     }
 
     /**
@@ -307,9 +309,78 @@ public class WeditorApplication extends Application {
         return status;
     }
 
+    /**
+     * Makes sure that file has valid structure
+     *
+     * @param file - full path to file.
+     * @return Returns null if everything is okay or error message otherwise.
+     * @throws IOException
+     */
+    private String validateFile(String file) {
+        String errMsg = null;
+        BufferedReader br = null;
+        String line;
+        int record = 0, dataEntry = 0;
+
+        try {
+            br = new BufferedReader(new FileReader(file));
+            outer_loop:
+            while ((line = br.readLine()) != null) {
+                while (line != null && line.startsWith("H")) {
+                    record++;
+                    line = br.readLine();
+                    while (line != null && line.startsWith("D")) {
+                        dataEntry++;
+                        line = br.readLine();
+                    }
+                    if (!(record >= 1 && dataEntry > 0)) {
+                        errMsg = "Invalid file format";
+                        break outer_loop;
+                    } else {
+                        record = dataEntry = 0;
+                    }
+                } // record
+                record = dataEntry = 0;
+            } // line reading loop
+            // *********************************************
+            // validation of the records
+            if (isNullOrEmpty(errMsg)) {
+                br = null;
+                // seek to beginning of the file
+                br = new BufferedReader(new FileReader(file));
+                OrderEntry orderEntry = null;
+                Order order = null;
+                outer_loop:
+                while ((line = br.readLine()) != null) {
+                    while (line != null && line.startsWith("H")) {
+                        order = new Order(line);
+                        // if order is okay
+                        if (order.validateOrder() == null) {
+                            while ((line = br.readLine()) != null) {
+                                if (line.startsWith("D"))
+                                    orderEntry = new OrderEntry(line);
+                                if (orderEntry.validateOrderEntry() != null) {
+                                    errMsg = orderEntry.validateOrderEntry();
+                                    break outer_loop;
+                                }
+                            }
+                        } else {
+                            errMsg = order.validateOrder();
+                            break outer_loop;
+                        }
+                    }
+                }
+
+            }
+        } catch (IOException ioEx) {
+            // we should not be here;
+            System.out.println(ioEx.getMessage() + " " + ioEx.getCause());
+        }
+        if (errMsg == null) errMsg = "File is Okay.";
+        return errMsg;
+    }
 
     private void fixEntry() {
-
 
     }
 }

@@ -1,24 +1,31 @@
 package data;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * User:
  * Date: 7/31/13
  * Time: 12:17 PM
- * To change this template use File | Settings | File Templates.
  */
 public class Order {
 
-
+    private static final String SPLITTER = "|";
     private String Column1;
     private String Column2;
-    private String Column7;
-    private String Column8;
-    private String Column3;
+    private String Column3; // record type
     private String Column4;
-    private String Column9;
-    private String Column10;
     private String Column5;
     private String Column6;
+    private String Column7;
+    private String Column8;
+    private String Column9;
+    private String Column10;
     private String Column11;
     private String Column12;
     private String Column13;
@@ -31,11 +38,13 @@ public class Order {
     private String Column20;
     private String Column21;
     private String Column22;
+    private RecordTypes RecordType;
+    private List<OrderEntry> orderEntries = new ArrayList<OrderEntry>(3);
 
+    public Order(String line) {
 
-    Order(String line) {
-        String record[] = line.split("\\|");
-        if (!line.isEmpty()) {
+        if (!isNullOrEmpty(line)) {
+            String record[] = Iterables.toArray(Splitter.on("|").trimResults().split(line), String.class);
             this.Column1 = record[0];
             this.Column2 = record[1];
             this.Column3 = record[2];
@@ -54,19 +63,104 @@ public class Order {
             this.Column16 = record[15];
             this.Column17 = record[16];
             this.Column18 = record[17];
-            this.Column15 = record[18];
-            this.Column16 = record[19];
-            this.Column17 = record[20];
-            this.Column18 = record[21];
+            this.Column19 = record[18];
+            this.Column20 = record[19];
+            this.Column21 = record[20];
+            this.Column22 = record[21];
         }
     }
 
+    public Order() {
+        throw new UnsupportedOperationException();
+    }
+
+    public RecordTypes getRecordType() {
+        return RecordType;
+    }
+
+    public void setRecordType(RecordTypes recordType) {
+        RecordType = recordType;
+    }
+
+    public List<OrderEntry> getOrderEntries() {
+        return orderEntries;
+    }
+
+    public void setOrderEntries(List<OrderEntry> orderEntries) {
+        this.orderEntries = orderEntries;
+    }
+
+    private void addEntry(String line) {
+
+        OrderEntry entry = new OrderEntry(line);
+        orderEntries.add(entry);
+    }
+
     /**
+     * Validates order entry and returns error message when mandatory fields are missing.
+     *
      * @return
      */
     public String validateOrder() {
 
+        if (isNullOrEmpty(getColumn1()) ||
+                isNullOrEmpty(getColumn2()) ||
+                isNullOrEmpty(getColumn3()) ||
+                isNullOrEmpty(getColumn4()) ||
+                isNullOrEmpty(getColumn5()) ||
+                isNullOrEmpty(getColumn6()) ||
+                isNullOrEmpty(getColumn7()) ||
+                isNullOrEmpty(getColumn8()) ||
+                isNullOrEmpty(getColumn9()) ||
+                isNullOrEmpty(getColumn10()) ||
+                isNullOrEmpty(getColumn11()) ||
+                isNullOrEmpty(getColumn12()) ||
+                isNullOrEmpty(getColumn13()) ||
+                isNullOrEmpty(getColumn14()) ||
+                isNullOrEmpty(getColumn15()) ||
+                isNullOrEmpty(getColumn16()) ||
+                isNullOrEmpty(getColumn17()) ||
+                isNullOrEmpty(getColumn18()) ||
+                isNullOrEmpty(getColumn19())
+                ) {
+            return "Order missing mandatory fields.";
+        }
         return null;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getColumn1() + SPLITTER +
+                getColumn1() + SPLITTER +
+                getColumn2() + SPLITTER +
+                getColumn3() + SPLITTER +
+                getColumn4() + SPLITTER +
+                getColumn5() + SPLITTER +
+                getColumn6() + SPLITTER +
+                getColumn7() + SPLITTER +
+                getColumn8() + SPLITTER +
+                getColumn9() + SPLITTER +
+                getColumn10() + SPLITTER +
+                getColumn11() + SPLITTER +
+                getColumn12() + SPLITTER +
+                getColumn13() + SPLITTER +
+                getColumn14() + SPLITTER +
+                getColumn15() + SPLITTER +
+                getColumn16() + SPLITTER +
+                getColumn17() + SPLITTER +
+                getColumn18() + SPLITTER +
+                getColumn19() + SPLITTER +
+                getColumn20() + SPLITTER +
+                getColumn21() + SPLITTER +
+                getColumn22() + SPLITTER);
+
+        for (OrderEntry details : orderEntries)
+            sb.append(details.toString());
+
+        return sb.toString();
     }
 
     /**

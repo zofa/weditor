@@ -9,6 +9,8 @@
     <name>weditor</name>
 
     <url>http://dev-web:8080/weditor</url>
+
+
     <organization>
         <name/>
     </organization>
@@ -247,6 +249,12 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
         </dependency>
 
 
