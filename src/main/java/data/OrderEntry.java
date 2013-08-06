@@ -44,7 +44,7 @@ public class OrderEntry {
             this.setColumn5(record[4]);
             this.setColumn6(record[5]);
 
-            dbConnect();
+            //dbConnect();
         } else {
             throw new UnsupportedOperationException("Cannot construct order entry with empty data.");
         }

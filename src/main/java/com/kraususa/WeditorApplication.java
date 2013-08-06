@@ -41,6 +41,8 @@ public class WeditorApplication extends Application {
     private Label topLabel;
     private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
+    private Button moveButton;
+    private final String FILE_OKAY = "File is Okay.";
 
     @Override
     public void init() {
@@ -128,6 +130,10 @@ public class WeditorApplication extends Application {
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
                     fixButton.setEnabled(true);
+                    if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY)
+                        moveButton.setEnabled(true);
+                    else
+                        moveButton.setEnabled(false);
                 } else {
                     fixButton.setEnabled(false);
                 }
@@ -187,14 +193,29 @@ public class WeditorApplication extends Application {
         fixButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                Mailer mailer = new Mailer();
+                mailer.sendTestMsg();
                 getMainWindow().showNotification("TODO:To be implemented");
                 logger.info("Trying to fix file..");
             }
         });
 
+        moveButton = new Button("Move file");
+        moveButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (table.getValue() != null) {
+                    moveFile(selectedFile);
+                }
+            }
+        }
+        );
+
+
         h.addComponent(saveButton);
         h.addComponent(saveAndMoveButton);
         h.addComponent(fixButton);
+        h.addComponent(moveButton);
 
         v.addComponent(h);
         //v.setComponentAlignment(saveAndMoveButton, Alignment.BOTTOM_RIGHT);
@@ -376,7 +397,7 @@ public class WeditorApplication extends Application {
             // we should not be here;
             System.out.println(ioEx.getMessage() + " " + ioEx.getCause());
         }
-        if (errMsg == null) errMsg = "File is Okay.";
+        if (errMsg == null) errMsg = FILE_OKAY;
         return errMsg;
     }
 
