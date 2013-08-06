@@ -43,8 +43,11 @@ public class OrderEntry {
             this.setColumn4(record[3]);
             this.setColumn5(record[4]);
             this.setColumn6(record[5]);
+
+            dbConnect();
+        } else {
+            throw new UnsupportedOperationException("Cannot construct order entry with empty data.");
         }
-        dbConnect();
     }
 
     private void dbConnect() {
@@ -68,31 +71,30 @@ public class OrderEntry {
     }
 
     /**
-     * returns error message when order is not valid and null otherwise.
+     * Returns error message when order is not valid and null otherwise.
      *
      * @return
      */
     public String validateOrderEntry() {
 
-        // all fields are mandatory
         String errors = null;
-        if (isNullOrEmpty(getColumn1())
-                ||
-                isNullOrEmpty(getColumn1())
-                ||
-                isNullOrEmpty(getColumn2())
-                ||
+        if (isNullOrEmpty(getColumn2())) {
+            errors = "Missing sage_id";
+        } else if (isNullOrEmpty(getColumn3())) {
+            errors = "Missing SKU";
+        } else if (
                 isNullOrEmpty(getColumn3())
-                ||
-                isNullOrEmpty(getColumn4())
-                ||
-                isNullOrEmpty(getColumn5())
-                ||
-                isNullOrEmpty(getColumn6())
+                        ||
+                        isNullOrEmpty(getColumn4())
+                        ||
+                        isNullOrEmpty(getColumn5())
+                        ||
+                        isNullOrEmpty(getColumn6())
                 )
 
+        {
             errors = "Missing mandatory fields";
-
+        }
         return errors;
     }
 

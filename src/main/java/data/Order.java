@@ -3,6 +3,7 @@ package data;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,8 @@ public class Order {
             this.Column20 = record[19];
             this.Column21 = record[20];
             this.Column22 = record[21];
+        } else {
+            throw new UnsupportedOperationException("Cannot construct record with empty string.");
         }
     }
 
@@ -128,6 +131,11 @@ public class Order {
         return null;
     }
 
+    /**
+     * Returns original string representation of the record including order entries.
+     *
+     * @return
+     */
     @Override
     public String toString() {
 
@@ -174,7 +182,13 @@ public class Order {
     /**
      * @return
      */
-    public String fixOrderEntries() {
+    public String fixOrderEntries() throws SQLException {
+
+        if (orderEntries.size() != 0) {
+            for (OrderEntry entry : orderEntries) {
+                entry.fixBasedOnSKUorSageID();
+            }
+        }
 
         return null;
     }
