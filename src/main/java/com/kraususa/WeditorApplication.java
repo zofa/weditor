@@ -64,10 +64,8 @@ public class WeditorApplication extends Application {
         table.setCaption("Error file editor");
         table.addContainerProperty("File name", String.class, null);
         table.addContainerProperty("# of records", Integer.class, null);
-        //table.addContainerProperty("Arrived at", String.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
         table.addContainerProperty("Errors", String.class, null);
-        // table.addContainerProperty("Action", NativeButton.class, null);
         table.setWidth("30%");
         table.setColumnFooter(table.firstItemId(), "2");
         table.setFooterVisible(true);
@@ -80,9 +78,7 @@ public class WeditorApplication extends Application {
         List<String> files = new ArrayList<String>(10);
 
         if (files != null) {
-
             files.addAll(this.listFiles(inFileDir));
-
             if (!files.isEmpty()) {
                 for (int i = 0; i < files.size(); i++) {
                     String theDealers = this.getDealersList(inFileDir + files.get(i)).toString();
@@ -181,8 +177,8 @@ public class WeditorApplication extends Application {
         saveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                logger.info("Saving with no file move.");
-                doSave(false);
+                logger.info("Saving file.");
+                getMainWindow().showNotification(doSave(false));
                 getMainWindow().getApplication().close();
                 getMainWindow().showNotification("Changes saved to file");
                 logger.info("File changes saved.");
@@ -193,9 +189,8 @@ public class WeditorApplication extends Application {
         fixButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                Mailer mailer = new Mailer();
-                mailer.sendTestMsg();
-                getMainWindow().showNotification("TODO:To be implemented");
+
+                getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_ERROR_MESSAGE);
                 logger.info("Trying to fix file..");
             }
         });
@@ -224,7 +219,7 @@ public class WeditorApplication extends Application {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 logger.info("Saving and moving file...");
-                doSave(true);
+                getMainWindow().showNotification(doSave(true), Window.Notification.POSITION_TOP_RIGHT);
                 getMainWindow().getApplication().close();
                 logger.info("File moved - reloading application UI");
             }
@@ -246,6 +241,12 @@ public class WeditorApplication extends Application {
         setMainWindow(mainWindow);
     }
 
+    /**
+     * returns list of files in the passed @path.
+     *
+     * @param path
+     * @return list of files in specified directory.
+     */
     protected List<String> listFiles(String path) {
 
         logger.info("Listing directory " + path);
@@ -257,12 +258,17 @@ public class WeditorApplication extends Application {
         List<String> fileList = new ArrayList<String>();
 
         for (File f : list) {
-            // System.out.println("File:" + f.getName());
             fileList.add(f.getName());
         }
         return fileList;
     }
 
+    /**
+     * Returns unique list of dealers from the @file.
+     *
+     * @param file
+     * @return
+     */
     protected Set<String> getDealersList(String file) {
 
         Set<String> dealers = new HashSet<String>();
@@ -300,7 +306,9 @@ public class WeditorApplication extends Application {
     }
 
     /**
-     * @param fileName should be exactly file name only - should not include
+     * Moves @filename the file from input to output directory.
+     *
+     * @param fileName should be exactly file name only.
      */
     protected void moveFile(String fileName) {
         File theFile = new File(fileName);
@@ -309,6 +317,12 @@ public class WeditorApplication extends Application {
         }
     }
 
+    /**
+     * Saves changes made in the editor to the file.
+     *
+     * @param move
+     * @return null when everything is okay and error msg when something went wrong.
+     */
     public String doSave(boolean move) {
         String status = null;
         if (!isNullOrEmpty(selectedFile) && !fileEditor.getValue().toString().isEmpty()) {
@@ -355,7 +369,7 @@ public class WeditorApplication extends Application {
                         line = br.readLine();
                     }
                     if (!(record >= 1 && dataEntry > 0)) {
-                        errMsg = "Invalid file format";
+                        errMsg = "Missing product Line";
                         break outer_loop;
                     } else {
                         record = dataEntry = 0;
