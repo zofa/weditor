@@ -122,7 +122,9 @@ public class WeditorApplication extends Application {
                     }
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
-                    fixButton.setEnabled(true);
+                    if (table.getValue() == "")
+                        fixButton.setEnabled(true);
+
                     if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY)
                         moveButton.setEnabled(true);
                     else
@@ -149,7 +151,6 @@ public class WeditorApplication extends Application {
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
         FieldEvents.TextChangeListener inputEventListener = new
-
                 FieldEvents.TextChangeListener() {
                     @Override
                     public void textChange(FieldEvents.TextChangeEvent event) {
@@ -241,6 +242,7 @@ public class WeditorApplication extends Application {
 
         mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
+        getMainWindow().showNotification(getAppBuildVersion(), Window.Notification.POSITION_TOP_RIGHT);
     }
 
     /**
@@ -433,13 +435,19 @@ public class WeditorApplication extends Application {
      * @return the maven build version
      * @throws IOException
      */
-    public String getAppBuildVersion() throws IOException {
+    public String getAppBuildVersion() {
 
         Properties props = new Properties();
-        props.load(OrderEntry.class.getClassLoader().getResourceAsStream("dbConnection.properties"));
+        try {
+            props.load(OrderEntry.class.getClassLoader().getResourceAsStream("buildinfo.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        String version = props.getProperty("build.version");
-        if (isNullOrEmpty(version))
+        String version = props.getProperty("build.version") +
+                " build at " +
+                props.getProperty("build.timestamp");
+        if (!isNullOrEmpty(version))
             return version;
         else
             return "UNABLE TO OBTAIN VERSION INFO see log for details.";
