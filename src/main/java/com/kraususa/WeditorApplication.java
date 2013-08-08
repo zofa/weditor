@@ -95,7 +95,7 @@ public class WeditorApplication extends Application {
         }
 
         table.setColumnFooter("File name", "Total files");
-        table.setColumnFooter("# of records", String.valueOf(files.size()));
+        table.setColumnFooter("DEALER LIST", String.valueOf(files.size()));
 
         final Label current = new Label("Selected: -");
         table.addListener(new Property.ValueChangeListener() {
@@ -122,8 +122,8 @@ public class WeditorApplication extends Application {
                     }
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
-                    if (table.getValue() == "")
-                        fixButton.setEnabled(true);
+                    // if (table.getValue() == "")
+                    fixButton.setEnabled(true);
 
                     if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY)
                         moveButton.setEnabled(true);
@@ -188,8 +188,10 @@ public class WeditorApplication extends Application {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
+                // getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
                 logger.info("Trying to fix file..");
+
+
             }
         });
 
@@ -425,6 +427,13 @@ public class WeditorApplication extends Application {
      */
     private String fixEntry() {
         String status = null;
+        if (isNullOrEmpty(selectedFile)) {
+
+            // create an array of order in the file
+            //List<Order> fileOrders = new
+
+
+        }
 
         return status;
     }
