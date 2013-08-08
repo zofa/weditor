@@ -16,10 +16,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -35,6 +32,7 @@ public class WeditorApplication extends Application {
     private static final long serialVersionUID = 3601221463880485916L;
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
     private final String fileFilter = "*.err";
+    private final String FILE_OKAY = "File is Okay.";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
@@ -42,7 +40,6 @@ public class WeditorApplication extends Application {
     private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
     private Button moveButton;
-    private final String FILE_OKAY = "File is Okay.";
 
     @Override
     public void init() {
@@ -63,10 +60,10 @@ public class WeditorApplication extends Application {
         table = new Table("List of error files");
         table.setCaption("Error file editor");
         table.addContainerProperty("File name", String.class, null);
-        table.addContainerProperty("# of records", Integer.class, null);
+        // table.addContainerProperty("# of records", Integer.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
         table.addContainerProperty("Errors", String.class, null);
-        table.setWidth("30%");
+        table.setWidth("25%");
         table.setColumnFooter(table.firstItemId(), "2");
         table.setFooterVisible(true);
         table.setSelectable(true);
@@ -85,7 +82,7 @@ public class WeditorApplication extends Application {
                     table.addItem(new Object[]
                             {
                                     files.get(i),
-                                    this.getDealersList(inFileDir + files.get(i)).size(),
+                                    // this.getDealersList(inFileDir + files.get(i)).size(),
                                     //  "",
                                     theDealers,
                                     // "Fix & sumbit"
@@ -190,7 +187,7 @@ public class WeditorApplication extends Application {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_ERROR_MESSAGE);
+                getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
                 logger.info("Trying to fix file..");
             }
         });
@@ -218,9 +215,14 @@ public class WeditorApplication extends Application {
         saveAndMoveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                logger.info("Saving and moving file...");
+                logger.info("Saving and preparing foe move..");
                 getMainWindow().showNotification(doSave(true), Window.Notification.POSITION_TOP_RIGHT);
-                getMainWindow().getApplication().close();
+                logger.info("Saved. Validating..");
+                if (validateFile(selectedFile) == null) {
+                    logger.info("Validation ok. Moving file..");
+                    moveFile(selectedFile);
+                    getMainWindow().getApplication().close();
+                }
                 logger.info("File moved - reloading application UI");
             }
         });
@@ -415,7 +417,31 @@ public class WeditorApplication extends Application {
         return errMsg;
     }
 
-    private void fixEntry() {
+    /**
+     * Tries to fix selected file and saves changes when succeeded.
+     * Displays error msg when something went wrong.
+     */
+    private String fixEntry() {
+        String status = null;
 
+        return status;
+    }
+
+    /**
+     * return current maven build version - good for displaying at bottom of page.
+     *
+     * @return the maven build version
+     * @throws IOException
+     */
+    public String getAppBuildVersion() throws IOException {
+
+        Properties props = new Properties();
+        props.load(OrderEntry.class.getClassLoader().getResourceAsStream("dbConnection.properties"));
+
+        String version = props.getProperty("build.version");
+        if (isNullOrEmpty(version))
+            return version;
+        else
+            return "UNABLE TO OBTAIN VERSION INFO see log for details.";
     }
 }
