@@ -151,6 +151,7 @@ public class WeditorApplication extends Application {
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
         FieldEvents.TextChangeListener inputEventListener = new
+
                 FieldEvents.TextChangeListener() {
                     @Override
                     public void textChange(FieldEvents.TextChangeEvent event) {
@@ -190,8 +191,7 @@ public class WeditorApplication extends Application {
 
                 // getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
                 logger.info("Trying to fix file..");
-
-
+                fixEntry();
             }
         });
 
@@ -202,6 +202,7 @@ public class WeditorApplication extends Application {
                 if (table.getValue() != null) {
                     moveFile(selectedFile);
                 }
+                getMainWindow().getApplication().close();
             }
         }
         );
@@ -218,7 +219,7 @@ public class WeditorApplication extends Application {
         saveAndMoveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                logger.info("Saving and preparing foe move..");
+                logger.info("Saving and preparing for move..");
                 getMainWindow().showNotification(doSave(true), Window.Notification.POSITION_TOP_RIGHT);
                 logger.info("Saved. Validating..");
                 if (validateFile(selectedFile) == null) {
@@ -427,14 +428,54 @@ public class WeditorApplication extends Application {
      */
     private String fixEntry() {
         String status = null;
-        if (isNullOrEmpty(selectedFile)) {
+        //Object rowId = null;
 
-            // create an array of order in the file
-            //List<Order> fileOrders = new
+        if (!isNullOrEmpty(selectedFile)
+            // &&
+            // (table.getItemIconPropertyId("Errors").getValue().toString().contains("Missing SKU") ||
+            //         table.getContainerProperty(rowId, "Errors").getValue().toString().contains("Missing sage_id")
+            // )
+                ) {
+            BufferedReader br;
+            String line, errMsg;
+            List<Order> OrdersInFile = new ArrayList<Order>(2);
+            try {
+
+                br = new BufferedReader(new FileReader(selectedFile));
+                OrderEntry orderEntry = null;
+                Order order = null;
+                outer_loop:
+                while ((line = br.readLine()) != null) {
+                    while (line != null && line.startsWith("H")) {
+                        order = new Order(line);
+                        while ((line = br.readLine()) != null && line.startsWith("D")) {
+                            orderEntry = new OrderEntry(line);
+                            order.addEntry(orderEntry);
+                        }
+                        OrdersInFile.add(order);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // all orders are red from file.
+            for (Order ord : OrdersInFile) {
+                ord.fixOrderEntries();
+            }
+            StringBuilder sb = new StringBuilder(2);
+            for (Order ord : OrdersInFile) {
+                sb.append(ord.toString());
+            }
+            getMainWindow().showNotification(sb.toString(), Window.Notification.TYPE_WARNING_MESSAGE);
+
+            System.out.println("-------------------------------------------");
+            System.out.println(sb.toString());
+            System.out.println("-------------------------------------------");
 
 
+            fileEditor.setValue(sb.toString());
+            saveButton.click();
         }
-
         return status;
     }
 

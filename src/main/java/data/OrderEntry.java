@@ -2,7 +2,6 @@ package data;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.mysql.jdbc.PreparedStatement;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -28,7 +27,7 @@ public class OrderEntry {
     Properties props;
     private String SPLITTER = "|";
     private Connection connect = null;
-    private Statement statement = null;
+    private PreparedStatement statement = null;
     private PreparedStatement preparedStatement = null;
     private ResultSet rs = null;
 
@@ -51,8 +50,8 @@ public class OrderEntry {
     }
 
     private void dbConnect() {
-        try {
 
+        try {
             props = new Properties();
             props.load(OrderEntry.class.getClassLoader().getResourceAsStream("dbConnection.properties"));
             this.host = props.getProperty("host", "dev-db");
@@ -101,15 +100,13 @@ public class OrderEntry {
     public void fixBasedOnSKUorSageID() throws SQLException {
 
         dbConnect();
-        statement = connect.createStatement();
+        preparedStatement = null;
         String tmp = null;
-
-        // if either  of the columns are not empty
+        // if either of the columns are not empty
         if (!(isNullOrEmpty(getColumn2())) && isNullOrEmpty(getColumn3())) {
             // sage_id based lookup
             if (isNullOrEmpty(getColumn2())) {
-
-                rs = statement.executeQuery("SELECT sku, sage_id FROM edi_errors.products WHERE sku like '" + getColumn3() + "' limit 2");
+                preparedStatement = connect.prepareStatement("SELECT sku, sage_id FROM edi_errors.products WHERE sku like '" + getColumn3() + "' limit 2");
                 rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {
@@ -136,7 +133,7 @@ public class OrderEntry {
                 getColumn2() + getSplitter() +
                 getColumn3() + getSplitter() +
                 getColumn4() + getSplitter() +
-                getColumn5() + getSplitter();
+                getColumn5() + getSplitter() + "\n";
     }
 
     public String getSplitter() {

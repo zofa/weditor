@@ -3,7 +3,6 @@ package data;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,9 +92,12 @@ public class Order {
         this.orderEntries = orderEntries;
     }
 
-    private void addEntry(String line) {
-
+    public void addEntry(String line) {
         OrderEntry entry = new OrderEntry(line);
+        orderEntries.add(entry);
+    }
+
+    public void addEntry(OrderEntry entry) {
         orderEntries.add(entry);
     }
 
@@ -180,16 +182,20 @@ public class Order {
     }
 
     /**
+     * looks up for the missing fields.
+     *
      * @return
      */
-    public String fixOrderEntries() throws SQLException {
-
+    public String fixOrderEntries() {
         if (orderEntries.size() != 0) {
-            for (OrderEntry entry : orderEntries) {
-                entry.fixBasedOnSKUorSageID();
+            try {
+                for (OrderEntry entry : orderEntries) {
+                    entry.fixBasedOnSKUorSageID();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-
         return null;
     }
 
