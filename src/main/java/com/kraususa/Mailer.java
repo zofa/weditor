@@ -15,7 +15,7 @@ public class Mailer {
 
     public void sendTestMsg() {
         String host = "smtp.gmail.com";
-        String from = "zafar@kraususa.com";
+        String from = "@kraususa.com";
         String pass = "";
         Properties props = System.getProperties();
         props.put("mail.smtp.starttls.enable", "true"); // added this line
@@ -25,7 +25,7 @@ public class Mailer {
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
 
-        String[] to = {"zafar@kraususa.com", "kbedi@kraususa.com"}; // added this line
+        String[] to = {"@kraususa.com", "kbedi@kraususa.com"}; // added this line
 
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage message = new MimeMessage(session);

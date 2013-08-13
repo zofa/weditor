@@ -18,16 +18,15 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class OrderEntry {
     static Logger logger = Logger.getLogger(OrderEntry.class);
     protected String host, user, pwd;
-    String column1;
-    String column2;
-    String column3;
+    String metaColumn;
+    String sageId;
+    String sku;
     String column4;
     String column5;
     String column6;
     Properties props;
     private String SPLITTER = "|";
     private Connection connect = null;
-    private PreparedStatement statement = null;
     private PreparedStatement preparedStatement = null;
     private ResultSet rs = null;
 
@@ -36,9 +35,9 @@ public class OrderEntry {
         if (!isNullOrEmpty(line)) {
             String record[] = Iterables.toArray(Splitter.on("|").trimResults().split(line), String.class);
 
-            this.setColumn1(record[0]); // sage_id
-            this.setColumn2(record[1]); // sku
-            this.setColumn3(record[2]);
+            this.setMetaColumn(record[0]); // sage_id
+            this.setSageId(record[1]); // sku
+            this.setSku(record[2]);
             this.setColumn4(record[3]);
             this.setColumn5(record[4]);
             this.setColumn6(record[5]);
@@ -50,7 +49,6 @@ public class OrderEntry {
     }
 
     private void dbConnect() {
-
         try {
             props = new Properties();
             props.load(OrderEntry.class.getClassLoader().getResourceAsStream("dbConnection.properties"));
@@ -60,7 +58,6 @@ public class OrderEntry {
 
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager.getConnection("jdbc:mysql://" + this.host + "/edi_errors?" + "user=" + this.user + "&password=" + this.pwd);
-
             logger.info("Successfully connected to " + this.host + " using user " + this.user);
 
         } catch (Exception e) {
@@ -77,12 +74,12 @@ public class OrderEntry {
     public String validateOrderEntry() {
 
         String errors = null;
-        if (isNullOrEmpty(getColumn2())) {
+        if (isNullOrEmpty(getSageId())) {
             errors = "Missing sage_id";
-        } else if (isNullOrEmpty(getColumn3())) {
+        } else if (isNullOrEmpty(getSku())) {
             errors = "Missing SKU";
         } else if (
-                isNullOrEmpty(getColumn3())
+                isNullOrEmpty(getSku())
                         ||
                         isNullOrEmpty(getColumn4())
                         ||
@@ -98,40 +95,68 @@ public class OrderEntry {
     }
 
     public void fixBasedOnSKUorSageID() throws SQLException {
-
-        dbConnect();
         preparedStatement = null;
         String tmp = null;
-        // if either of the columns are not empty
-        if (!(isNullOrEmpty(getColumn2())) && isNullOrEmpty(getColumn3())) {
-            // sage_id based lookup
-            if (isNullOrEmpty(getColumn2())) {
-                preparedStatement = connect.prepareStatement("SELECT sku, sage_id FROM edi_errors.products WHERE sku like '" + getColumn3() + "' limit 2");
+        // if either of the columns are empty
+        if (isNullOrEmpty(getSageId()) || isNullOrEmpty(getSku())) {
+            dbConnect();
+            // sage_id is empty looking based on sku
+            if (isNullOrEmpty(getSageId())) {
+                preparedStatement = connect.prepareStatement("SELECT sage_id FROM edi_errors.products WHERE sku like '" + getSku() + "' limit 2");
+                logger.debug("sage_id based lookup");
+                logger.debug(preparedStatement.toString());
                 rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {
                     tmp = rs.getString("sage_id");
                 }
                 if (!isNullOrEmpty(tmp))
-                    this.setColumn2(tmp);
+                    this.setSageId(tmp);
             }
-            // sku based lookup
-            else if (isNullOrEmpty(getColumn3())) {
-                rs = statement.executeQuery("SELECT sku, sage_id FROM edi_errors.products WHERE sage_id like '" + getColumn2() + "' limit 2");
+            // sku is empty looking up based on sage_id
+            else if (isNullOrEmpty(getSku())) {
+                preparedStatement = connect.prepareStatement("SELECT  sku FROM edi_errors.products WHERE sage_id like '" + getSageId() + "' limit 2");
+                logger.debug("sku based lookup");
+                logger.debug(preparedStatement.toString());
                 rs = preparedStatement.executeQuery();
 
+                while (rs.next())
+                    tmp = rs.getString("sku");
+
                 if (!isNullOrEmpty(tmp))
-                    this.setColumn3(tmp);
+                    this.setSku(tmp);
             }
 
         }
+
+        // if the fields are dups
+        if (getSku() == getSageId()) {
+            // first remove braces if there are any
+            if (getSku().contains("(") && getSku().contains(")")) {
+                setSku(getSku().replaceAll("\\b(\\(.+\\))\\b", ""));
+            }
+
+            preparedStatement = connect.prepareStatement("SELECT  sku FROM edi_errors.products WHERE sage_id like '" + getSageId() + "' limit 2");
+            logger.debug("sku based lookup");
+            logger.debug(preparedStatement.toString());
+            rs = preparedStatement.executeQuery();
+
+            while (rs.next())
+                tmp = rs.getString("sku");
+
+            if (!isNullOrEmpty(tmp))
+                this.setSku(tmp);
+
+
+        }
+
     }
 
     @Override
     public String toString() {
-        return getColumn1() + getSplitter() +
-                getColumn2() + getSplitter() +
-                getColumn3() + getSplitter() +
+        return getMetaColumn() + getSplitter() +
+                getSageId() + getSplitter() +
+                getSku() + getSplitter() +
                 getColumn4() + getSplitter() +
                 getColumn5() + getSplitter() + "\n";
     }
@@ -144,28 +169,28 @@ public class OrderEntry {
         this.SPLITTER = splitter;
     }
 
-    public String getColumn1() {
-        return column1;
+    public String getMetaColumn() {
+        return metaColumn;
     }
 
-    public void setColumn1(String column1) {
-        this.column1 = column1;
+    public void setMetaColumn(String metaColumn) {
+        this.metaColumn = metaColumn;
     }
 
-    public String getColumn2() {
-        return column2;
+    public String getSageId() {
+        return sageId;
     }
 
-    public void setColumn2(String column2) {
-        this.column2 = column2;
+    public void setSageId(String sageId) {
+        this.sageId = sageId;
     }
 
-    public String getColumn3() {
-        return column3;
+    public String getSku() {
+        return sku;
     }
 
-    public void setColumn3(String column3) {
-        this.column3 = column3;
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
     public String getColumn4() {

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# set -x
+ set -x
 # --------------------------------------------------------------------------------------------------------
 # Purpose:
 # 	To be used in cron for monitoring error files arrival and sending notification
@@ -8,14 +8,13 @@
 # 	30 * * * * /path/to/this/file
 # to monitor each 30 or less minutes
 
-# to avoid home directory issues.
-cd $(dirname $0)
 
-#
 # *********** CHANGE HISTORY *************
 # 8/4/13  -- added sending mail notification for order cancellation records
 
+
 # --------------------------------------------------------------------------------------------------------
+cd $(dirname $0)
 # algorithm
 
 #1. Read from file previous file count. If file does not exists - create one and exit
@@ -24,8 +23,10 @@ cd $(dirname $0)
 #4. Otherwise - persist number of files in file and exit
 # Same algorithm used for counting cancel records.
 # --------------------------------------------------------------------------------
+SUBJECT="New Error files arrived. Please investigate."
+BODY=""
 IN_DIR="/errfiles/infiles"
-CURRENT_COUNT=`ls ${IN_DIR}  | wc -l`
+CURRENT_COUNT=`ls $IN_DIR/*err -l | wc -l`
 last_file_count="";
 app_link="http://fixedi.kraususa.net:8080/";
 
@@ -34,18 +35,16 @@ LAST_CANCEL_ORDER_NUM="";
 
 # --------------------------------------------------------------------------------------------------------
 TO_EMAIL="kbedi@kraususa.com" # orders@kraususa.com  kbedi
-SUBJECT="New Error files arrived. Please investigate."
-BODY=""
 # --------------------------------------------------------------------------------------------------------
 # routines goes here
-
 send_notification ()
 {
+#  Error notification [please take action]
    echo "About to send email with Subject $1 to $TO_EMAIL";
 
-which `sendmail` ${TO_EMAIL}  << EOF
-From: Notifitor <notification@kraususa.com>
-To: Nitification receipients <notifications@kraususa.com>
+/usr/sbin/sendmail ${TO_EMAIL}  << EOF
+From: Notifications <notification@kraususa.com>
+To: Notification receipients <notifications@kraususa.com>
 Subject: $1
 --------------------------------------------------------------------------------------------------
 ${BODY}
@@ -60,9 +59,13 @@ EOF
 # checking for existing the input directory
 if [ ! -d "${IN_DIR}" ]
    then
+   if [ ! -f error_sent ]
+   then
      BODY="I cannot find input directory for errors lookup: ${IN_DIR} at `hostname`";
      send_notification "ERROR" ;
+     echo "dummy" > error_sent;
      exit 1;
+   fi
 fi
 
 
@@ -75,12 +78,13 @@ while read line; do
 
 	if [ "$CURRENT_COUNT" -gt "$last_file_count" ]
 	then
-	  echo `ls ${IN_DIR} | wc -l` > file_count;
+	  echo `ls ${IN_DIR}/*err -l | wc -l` > file_count;
 	  BODY="Please go to link below to fix the files: ${app_link}";
 	  send_notification "New Error files arrived [please fix]";
 	fi
+ echo `ls ${IN_DIR}/*err -l | wc -l` > file_count;
 else
- echo `ls ${IN_DIR} | wc -l` > file_count;
+ echo `ls ${IN_DIR}/*err -l | wc -l` > file_count;
 fi
 # --------------------------------------------------------------------------------------------------------
 # counting number of cancellation records
@@ -91,14 +95,13 @@ then
    LAST_CANCEL_ORDER_NUM="$line";
  done < cancels_count;
 
-CURRENT_CANCELS=`grep -R "CNC" ${IN_DIR} | wc -l`;
+CURRENT_CANCELS=`grep -R "CNC" ${IN_DIR}/*err | wc -l`;
 	if [ ${CURRENT_CANCELS} -gt ${LAST_CANCEL_ORDER_NUM} ]
 	   then
-        cancels=(`awk 'BEGIN { FS = "|" } ; { if ($1=="H" && $3=="CNC") print $2;}' ${IN_DIR}/*err`);
+        cancels=(`awk 'BEGIN { FS = "|" } ; { if ($1=="H" && $3=="CNC") print $7;}' ${IN_DIR}/*err`);
         pns=(`awk 'BEGIN { FS = "|" } ; { if ($1=="H" && $3=="CNC") print $5;}' ${IN_DIR}/*err`);
         for (( i=0; i<${#cancels[@]}; i++)); do
-            BODY=" Hi there,
-
+            BODY="
 There are сancellation request received with following details
 
                   Dealer: ${cancels[$i]}
@@ -108,8 +111,12 @@ There are сancellation request received with following details
 Please use the link ${app_link} to fix them.";
 		    send_notification "Order cancellation received from [${cancels[$i]} | PO#=${pns[$i]}]";
         done
-	echo `grep -R "CNC" ${IN_DIR} | wc -l` > cancels_count;
+	echo `grep -R "CNC" ${IN_DIR}/*err | wc -l` > cancels_count;
+
+	else
+	echo `grep -R "CNC" ${IN_DIR}/*err | wc -l` > cancels_count;
 	fi
+
 else
-  echo `grep -R "CNC" ${IN_DIR} | wc -l` > cancels_count;
+  echo `grep -R "CNC" ${IN_DIR}/*err | wc -l` > cancels_count;
 fi

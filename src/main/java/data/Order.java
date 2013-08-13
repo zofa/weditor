@@ -143,29 +143,29 @@ public class Order {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getColumn1() + SPLITTER +
+        sb.append(
                 getColumn1() + SPLITTER +
-                getColumn2() + SPLITTER +
-                getColumn3() + SPLITTER +
-                getColumn4() + SPLITTER +
-                getColumn5() + SPLITTER +
-                getColumn6() + SPLITTER +
-                getColumn7() + SPLITTER +
-                getColumn8() + SPLITTER +
-                getColumn9() + SPLITTER +
-                getColumn10() + SPLITTER +
-                getColumn11() + SPLITTER +
-                getColumn12() + SPLITTER +
-                getColumn13() + SPLITTER +
-                getColumn14() + SPLITTER +
-                getColumn15() + SPLITTER +
-                getColumn16() + SPLITTER +
-                getColumn17() + SPLITTER +
-                getColumn18() + SPLITTER +
-                getColumn19() + SPLITTER +
-                getColumn20() + SPLITTER +
-                getColumn21() + SPLITTER +
-                getColumn22() + SPLITTER);
+                        getColumn2() + SPLITTER +
+                        getColumn3() + SPLITTER +
+                        getColumn4() + SPLITTER +
+                        getColumn5() + SPLITTER +
+                        getColumn6() + SPLITTER +
+                        getColumn7() + SPLITTER +
+                        getColumn8() + SPLITTER +
+                        getColumn9() + SPLITTER +
+                        getColumn10() + SPLITTER +
+                        getColumn11() + SPLITTER +
+                        getColumn12() + SPLITTER +
+                        getColumn13() + SPLITTER +
+                        getColumn14() + SPLITTER +
+                        getColumn15() + SPLITTER +
+                        getColumn16() + SPLITTER +
+                        getColumn17() + SPLITTER +
+                        getColumn18() + SPLITTER +
+                        getColumn19() + SPLITTER +
+                        getColumn20() + SPLITTER +
+                        getColumn21() + SPLITTER +
+                        getColumn22() + SPLITTER + "\n");
 
         for (OrderEntry details : orderEntries)
             sb.append(details.toString());
@@ -187,6 +187,7 @@ public class Order {
      * @return
      */
     public String fixOrderEntries() {
+        String status = null;
         if (orderEntries.size() != 0) {
             try {
                 for (OrderEntry entry : orderEntries) {
@@ -194,9 +195,10 @@ public class Order {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                status = e.getCause().toString();
             }
         }
-        return null;
+        return status;
     }
 
     public String getColumn1() {

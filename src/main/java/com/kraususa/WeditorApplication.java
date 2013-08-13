@@ -444,7 +444,7 @@ public class WeditorApplication extends Application {
                 br = new BufferedReader(new FileReader(selectedFile));
                 OrderEntry orderEntry = null;
                 Order order = null;
-                outer_loop:
+
                 while ((line = br.readLine()) != null) {
                     while (line != null && line.startsWith("H")) {
                         order = new Order(line);
@@ -472,9 +472,9 @@ public class WeditorApplication extends Application {
             System.out.println(sb.toString());
             System.out.println("-------------------------------------------");
 
-
             fileEditor.setValue(sb.toString());
-            saveButton.click();
+            doSave(false);
+
         }
         return status;
     }
