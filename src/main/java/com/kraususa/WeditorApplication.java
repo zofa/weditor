@@ -4,6 +4,7 @@
 package com.kraususa;
 
 
+import com.kraususa.widgetset.testComposite;
 import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.FilesystemContainer;
@@ -36,7 +37,6 @@ public class WeditorApplication extends Application {
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
-    private Label topLabel;
     private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
     private Button moveButton;
@@ -106,7 +106,7 @@ public class WeditorApplication extends Application {
                     BufferedReader br = null;
 
                     try {
-                        selectedFile = inFileDir + (String) table.getContainerProperty(rowId, "File name").getValue();
+                        selectedFile = inFileDir + table.getContainerProperty(rowId, "File name").getValue();
                         br = new BufferedReader(new FileReader(selectedFile));
                         StringBuilder sb = new StringBuilder();
                         String line = br.readLine();
@@ -122,13 +122,18 @@ public class WeditorApplication extends Application {
                     }
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
-                    // if (table.getValue() == "")
-                    fixButton.setEnabled(true);
 
-                    if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY)
+                    if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY) {
                         moveButton.setEnabled(true);
-                    else
+                        fixButton.setEnabled(false);
+                    } else if (table.getContainerProperty(rowId, "Errors").getValue().toString().toLowerCase().contains("mandatory fields")) {
                         moveButton.setEnabled(false);
+                        fixButton.setEnabled(false);
+                    } else if (table.getContainerProperty(rowId, "Errors").getValue().toString().toLowerCase().contains("missing")) {
+                        moveButton.setEnabled(false);
+                        fixButton.setEnabled(true);
+                    }
+
                 } else {
                     fixButton.setEnabled(false);
                 }
@@ -176,9 +181,9 @@ public class WeditorApplication extends Application {
         saveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                logger.info("Saving file.");
-                getMainWindow().showNotification(doSave(false));
                 getMainWindow().getApplication().close();
+                logger.info("Saving file " + selectedFile);
+                getMainWindow().showNotification(doSave(false));
                 getMainWindow().showNotification("Changes saved to file");
                 logger.info("File changes saved.");
             }
@@ -207,7 +212,6 @@ public class WeditorApplication extends Application {
         }
         );
 
-
         h.addComponent(saveButton);
         h.addComponent(saveAndMoveButton);
         h.addComponent(fixButton);
@@ -235,13 +239,13 @@ public class WeditorApplication extends Application {
         split.addComponent(v);
         split.setHeight("80%");
 
-
         //verticalLayout.addComponent(topLabel);
         verticalLayout.addComponent(split);
         verticalLayout.addComponent(processingTable);
         verticalLayout.setMargin(true);
         verticalLayout.setWidth("100%");
         verticalLayout.setHeight("100%");
+        verticalLayout.addComponent(new testComposite());
 
         mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
@@ -257,7 +261,6 @@ public class WeditorApplication extends Application {
     protected List<String> listFiles(String path) {
 
         logger.info("Listing directory " + path);
-
         File root = new File(path);
         FileFilter ff = new WildcardFileFilter(fileFilter);
         File[] list = root.listFiles(ff);
@@ -318,9 +321,13 @@ public class WeditorApplication extends Application {
      * @param fileName should be exactly file name only.
      */
     protected void moveFile(String fileName) {
+
+        logger.info("About to move file " + fileName + " to output directory.");
         File theFile = new File(fileName);
         if (!theFile.renameTo(new File(outFileDir + theFile.getName()))) {
-            getMainWindow().showNotification("Failed to move file", Window.Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().getApplication().close();
+            getMainWindow().showNotification("Failed to move file. See log for details. Either file exists or permission denied.", Window.Notification.TYPE_ERROR_MESSAGE);
+            logger.error("Unable to move file " + fileName);
         }
     }
 
@@ -384,6 +391,7 @@ public class WeditorApplication extends Application {
                 } // record
                 record = dataEntry = 0;
             } // line reading loop
+
             // *********************************************
             // validation of the records
             if (isNullOrEmpty(errMsg)) {
@@ -412,7 +420,6 @@ public class WeditorApplication extends Application {
                         }
                     }
                 }
-
             }
         } catch (IOException ioEx) {
             // we should not be here;
@@ -473,8 +480,8 @@ public class WeditorApplication extends Application {
             System.out.println("-------------------------------------------");
 
             fileEditor.setValue(sb.toString());
-            doSave(false);
-
+            getMainWindow().getApplication().close();
+            getMainWindow().showNotification(doSave(false));
         }
         return status;
     }

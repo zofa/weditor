@@ -167,9 +167,10 @@ public class Order {
                         getColumn21() + SPLITTER +
                         getColumn22() + SPLITTER + "\n");
 
-        for (OrderEntry details : orderEntries)
+        for (OrderEntry details : orderEntries) {
             sb.append(details.toString());
-
+            sb.append("\n");
+        }
         return sb.toString();
     }
 
