@@ -43,7 +43,9 @@ public class WeditorApplication extends Application {
 
     @Override
     public void init() {
-        final Window mainWindow = new Window("Weditor app");
+
+        setTheme("weditortheme");
+        final Window mainWindow = new Window("Kraus USA EDI Errors");
 
         mainWindow.addListener(new Window.CloseListener() {
             @Override
@@ -193,7 +195,6 @@ public class WeditorApplication extends Application {
         fixButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-
                 // getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
                 logger.info("Trying to fix file..");
                 fixEntry();
@@ -237,19 +238,28 @@ public class WeditorApplication extends Application {
         v.addComponent(fileEditor);
         v.addComponent(current);
         split.addComponent(v);
-        split.setHeight("80%");
+        split.setHeight("90%");
 
         //verticalLayout.addComponent(topLabel);
+        testComposite t = new testComposite();
+
+        t.setHeight("50%");
+        verticalLayout.setSpacing(false);
+        verticalLayout.addComponent(t);
         verticalLayout.addComponent(split);
         verticalLayout.addComponent(processingTable);
+
         verticalLayout.setMargin(true);
         verticalLayout.setWidth("100%");
         verticalLayout.setHeight("100%");
-        verticalLayout.addComponent(new testComposite());
 
         mainWindow.setContent(verticalLayout);
+        mainWindow.addComponent(new Label("sdf"));
+        mainWindow.addComponent(new Label("sdf"));
+        mainWindow.addComponent(new Label("sdf"));
         setMainWindow(mainWindow);
         getMainWindow().showNotification(getAppBuildVersion(), Window.Notification.POSITION_TOP_RIGHT);
+
     }
 
     /**
