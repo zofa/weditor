@@ -4,7 +4,8 @@
 package com.kraususa;
 
 
-import com.kraususa.widgetset.testComposite;
+import com.kraususa.widgetset.BottomPanel;
+import com.kraususa.widgetset.TopPanel;
 import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.FilesystemContainer;
@@ -17,7 +18,10 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -60,12 +64,11 @@ public class WeditorApplication extends Application {
         logger.info("Initializing the application.");
         // -------------------------------------------------------------------------------------------------------------
         table = new Table("List of error files");
-        table.setCaption("Error file editor");
         table.addContainerProperty("File name", String.class, null);
         // table.addContainerProperty("# of records", Integer.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
         table.addContainerProperty("Errors", String.class, null);
-        table.setWidth("25%");
+        table.setWidth("100%");
         table.setColumnFooter(table.firstItemId(), "2");
         table.setFooterVisible(true);
         table.setSelectable(true);
@@ -97,7 +100,7 @@ public class WeditorApplication extends Application {
         }
 
         table.setColumnFooter("File name", "Total files");
-        table.setColumnFooter("DEALER LIST", String.valueOf(files.size()));
+        table.setColumnFooter("Dealer list", String.valueOf(files.size()));
 
         final Label current = new Label("Selected: -");
         table.addListener(new Property.ValueChangeListener() {
@@ -152,6 +155,7 @@ public class WeditorApplication extends Application {
         fileEditor = new com.vaadin.ui.TextArea("FIle content");
         fileEditor.setWidth("70%");
         fileEditor.setRows(20);
+        fileEditor.setHeight("100%");
         fileEditor.setWordwrap(false);
         fileEditor.setColumns(40);
         fileEditor.setSizeFull();
@@ -170,9 +174,10 @@ public class WeditorApplication extends Application {
 
         // -------------------------------------------------------------------------------------------------------------
         HorizontalSplitPanel split = new HorizontalSplitPanel();
-        split.setSplitPosition(35, Sizeable.UNITS_PERCENTAGE);
+        split.setSplitPosition(40, Sizeable.UNITS_PERCENTAGE);
         split.addComponent(table);
         VerticalLayout v = new VerticalLayout();
+        // for action buttons
         HorizontalLayout h = new HorizontalLayout();
 
         saveAndMoveButton = new Button("Save changes and move file");
@@ -238,28 +243,43 @@ public class WeditorApplication extends Application {
         v.addComponent(fileEditor);
         v.addComponent(current);
         split.addComponent(v);
-        split.setHeight("90%");
+        split.setCaption("Error files");
+        //split.setHeight("90%");
 
         //verticalLayout.addComponent(topLabel);
-        testComposite t = new testComposite();
+        TopPanel t = new TopPanel();
 
-        t.setHeight("50%");
         verticalLayout.setSpacing(false);
         verticalLayout.addComponent(t);
         verticalLayout.addComponent(split);
-        verticalLayout.addComponent(processingTable);
+
+        // -------------------------------------------------------------
+        // Processing information
+        HorizontalSplitPanel processingSplit = new HorizontalSplitPanel();
+        processingSplit.addComponent(processingTable);
+
+        TextArea processingQueueFileContent = new com.vaadin.ui.TextArea("File Contents");
+        processingQueueFileContent.setSizeFull();
+        processingSplit.addComponent(processingQueueFileContent);
+
+        processingSplit.setSplitPosition(40, Sizeable.UNITS_PERCENTAGE);
+        processingSplit.setCaption("Processing queue");
+
+
+        verticalLayout.addComponent(processingSplit);
+        processingSplit.setMargin(true);
+
+        verticalLayout.addComponent(new BottomPanel());
 
         verticalLayout.setMargin(true);
         verticalLayout.setWidth("100%");
         verticalLayout.setHeight("100%");
+        verticalLayout.setExpandRatio(t, 1);
+        verticalLayout.setExpandRatio(split, 4);
+        verticalLayout.setExpandRatio(processingSplit, 8.8f);
 
         mainWindow.setContent(verticalLayout);
-        mainWindow.addComponent(new Label("sdf"));
-        mainWindow.addComponent(new Label("sdf"));
-        mainWindow.addComponent(new Label("sdf"));
         setMainWindow(mainWindow);
-        getMainWindow().showNotification(getAppBuildVersion(), Window.Notification.POSITION_TOP_RIGHT);
-
     }
 
     /**
@@ -496,27 +516,4 @@ public class WeditorApplication extends Application {
         return status;
     }
 
-    /**
-     * return current maven build version - good for displaying at bottom of page.
-     *
-     * @return the maven build version
-     * @throws IOException
-     */
-    public String getAppBuildVersion() {
-
-        Properties props = new Properties();
-        try {
-            props.load(OrderEntry.class.getClassLoader().getResourceAsStream("buildinfo.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String version = props.getProperty("build.version") +
-                " build at " +
-                props.getProperty("build.timestamp");
-        if (!isNullOrEmpty(version))
-            return version;
-        else
-            return "UNABLE TO OBTAIN VERSION INFO see log for details.";
-    }
 }
