@@ -20,24 +20,24 @@ public class Order {
     private String Column2;
     private String Column3; // record type
     private String Column4;
-    private String Column5;
-    private String Column6;
-    private String Column7;
-    private String Column8;
-    private String Column9;
+    private String PONum;
+    private String OrderDate;
+    private String DealerCol7;
+    private String Currency;
+    private String DealerCol9;
     private String Column10;
     private String Column11;
-    private String Column12;
-    private String Column13;
-    private String Column14;
+    private String CustomerName1;
+    private String CustomerName2;
+    private String AddressLine1;
     private String Column15;
     private String Column16;
-    private String Column17;
-    private String Column18;
-    private String Column19;
-    private String Column20;
+    private String City;
+    private String State;
+    private String ZipCode;
+    private String CountryCode;
     private String Column21;
-    private String Column22;
+    private String ShippingCarrier;
     private RecordTypes RecordType;
     private List<OrderEntry> orderEntries = new ArrayList<OrderEntry>(3);
 
@@ -49,24 +49,24 @@ public class Order {
             this.Column2 = record[1];
             this.Column3 = record[2];
             this.Column4 = record[3];
-            this.Column5 = record[4];
-            this.Column6 = record[5];
-            this.Column7 = record[6];
-            this.Column8 = record[7];
-            this.Column9 = record[8];
+            this.PONum = record[4];
+            this.OrderDate = record[5];
+            this.DealerCol7 = record[6];
+            this.Currency = record[7];
+            this.DealerCol9 = record[8];
             this.Column10 = record[9];
             this.Column11 = record[10];
-            this.Column12 = record[11];
-            this.Column13 = record[12];
-            this.Column14 = record[13];
+            this.CustomerName1 = record[11];
+            this.CustomerName2 = record[12];
+            this.AddressLine1 = record[13];
             this.Column15 = record[14];
             this.Column16 = record[15];
-            this.Column17 = record[16];
-            this.Column18 = record[17];
-            this.Column19 = record[18];
-            this.Column20 = record[19];
+            this.City = record[16];
+            this.State = record[17];
+            this.ZipCode = record[18];
+            this.CountryCode = record[19];
             this.Column21 = record[20];
-            this.Column22 = record[21];
+            this.ShippingCarrier = record[21];
         } else {
             throw new UnsupportedOperationException("Cannot construct record with empty string.");
         }
@@ -102,35 +102,54 @@ public class Order {
     }
 
     /**
-     * Validates order entry and returns error message when mandatory fields are missing.
+     * Validates order entry and returns error message when
+     * mandatory fields are missing, null otherwise.
      *
      * @return
      */
     public String validateOrder() {
 
+        StringBuilder sb = new StringBuilder(10).append("Missing ");
+
         if (isNullOrEmpty(getColumn1()) ||
                 isNullOrEmpty(getColumn2()) ||
                 isNullOrEmpty(getColumn3()) ||
-                isNullOrEmpty(getColumn4()) ||
-                isNullOrEmpty(getColumn5()) ||
-                isNullOrEmpty(getColumn6()) ||
-                isNullOrEmpty(getColumn7()) ||
-                isNullOrEmpty(getColumn8()) ||
-                isNullOrEmpty(getColumn9()) ||
-                isNullOrEmpty(getColumn10()) ||
-                isNullOrEmpty(getColumn11()) ||
-                isNullOrEmpty(getColumn12()) ||
-                isNullOrEmpty(getColumn13()) ||
-                isNullOrEmpty(getColumn14()) ||
-                isNullOrEmpty(getColumn15()) ||
-                isNullOrEmpty(getColumn16()) ||
-                isNullOrEmpty(getColumn17()) ||
-                isNullOrEmpty(getColumn18()) ||
-                isNullOrEmpty(getColumn19())
+                isNullOrEmpty(getColumn4())
                 ) {
-            return "Order missing mandatory fields.";
+            sb.append("first 4th columns, ");
+        } else if (isNullOrEmpty(getPONum())) {
+            sb.append("PO#, ");
+        } else if (isNullOrEmpty(getOrderDate())) {
+            sb.append(" Order Date, ");
+        } else if (isNullOrEmpty(getDealerCol7())) {
+            sb.append(" DealerCol7, ");
+        } else if (isNullOrEmpty(getCurrency())) {
+            sb.append(" Currency, ");
+        } else if (isNullOrEmpty(getDealerCol9())) {
+            sb.append(" DealerCol9, ");
+        } else if (isNullOrEmpty(getColumn10()) ||
+                isNullOrEmpty(getColumn11())) {
+            sb.append(" Columns 10 and 11, ");
+        } else if (isNullOrEmpty(getCustomerName1())) {
+            sb.append(" Customer Name1 ");
         }
-        return null;
+        if (isNullOrEmpty(getCustomerName2())) {
+            sb.append(" Customer Name1 ");
+        } else if (isNullOrEmpty(getAddressLine1()) ||
+                isNullOrEmpty(getColumn15()) ||
+                isNullOrEmpty(getColumn16())) {
+            sb.append(" Columns 15, 16");
+        } else if (
+                isNullOrEmpty(getCity())) {
+            sb.append(" City");
+        } else if (
+                isNullOrEmpty(getState())) {
+            sb.append(" State ");
+        } else if (isNullOrEmpty(getZipCode())) {
+            sb.append("ZipCode");
+            return sb.toString() == "Missing " ? "" : sb.toString();
+        }
+        return sb.toString();
     }
 
     /**
@@ -148,24 +167,24 @@ public class Order {
                         getColumn2() + SPLITTER +
                         getColumn3() + SPLITTER +
                         getColumn4() + SPLITTER +
-                        getColumn5() + SPLITTER +
-                        getColumn6() + SPLITTER +
-                        getColumn7() + SPLITTER +
-                        getColumn8() + SPLITTER +
-                        getColumn9() + SPLITTER +
+                        getPONum() + SPLITTER +
+                        getOrderDate() + SPLITTER +
+                        getDealerCol7() + SPLITTER +
+                        getCurrency() + SPLITTER +
+                        getDealerCol9() + SPLITTER +
                         getColumn10() + SPLITTER +
                         getColumn11() + SPLITTER +
-                        getColumn12() + SPLITTER +
-                        getColumn13() + SPLITTER +
-                        getColumn14() + SPLITTER +
+                        getCustomerName1() + SPLITTER +
+                        getCustomerName2() + SPLITTER +
+                        getAddressLine1() + SPLITTER +
                         getColumn15() + SPLITTER +
                         getColumn16() + SPLITTER +
-                        getColumn17() + SPLITTER +
-                        getColumn18() + SPLITTER +
-                        getColumn19() + SPLITTER +
-                        getColumn20() + SPLITTER +
+                        getCity() + SPLITTER +
+                        getState() + SPLITTER +
+                        getZipCode() + SPLITTER +
+                        getCountryCode() + SPLITTER +
                         getColumn21() + SPLITTER +
-                        getColumn22() + SPLITTER + "\n");
+                        getShippingCarrier() + SPLITTER + "\n");
 
         for (OrderEntry details : orderEntries) {
             sb.append(details.toString());
@@ -177,6 +196,7 @@ public class Order {
     /**
      * @return
      */
+
     public String validateOrderEntries() {
 
         return null;
@@ -218,20 +238,20 @@ public class Order {
         Column2 = column2;
     }
 
-    public String getColumn7() {
-        return Column7;
+    public String getDealerCol7() {
+        return DealerCol7;
     }
 
-    public void setColumn7(String column7) {
-        Column7 = column7;
+    public void setDealerCol7(String dealerCol7) {
+        DealerCol7 = dealerCol7;
     }
 
-    public String getColumn8() {
-        return Column8;
+    public String getCurrency() {
+        return Currency;
     }
 
-    public void setColumn8(String column8) {
-        Column8 = column8;
+    public void setCurrency(String currency) {
+        Currency = currency;
     }
 
     public String getColumn3() {
@@ -250,12 +270,12 @@ public class Order {
         Column4 = column4;
     }
 
-    public String getColumn9() {
-        return Column9;
+    public String getDealerCol9() {
+        return DealerCol9;
     }
 
-    public void setColumn9(String column9) {
-        Column9 = column9;
+    public void setDealerCol9(String dealerCol9) {
+        DealerCol9 = dealerCol9;
     }
 
     public String getColumn10() {
@@ -266,20 +286,20 @@ public class Order {
         Column10 = column10;
     }
 
-    public String getColumn5() {
-        return Column5;
+    public String getPONum() {
+        return PONum;
     }
 
-    public void setColumn5(String column5) {
-        Column5 = column5;
+    public void setPONum(String PONum) {
+        this.PONum = PONum;
     }
 
-    public String getColumn6() {
-        return Column6;
+    public String getOrderDate() {
+        return OrderDate;
     }
 
-    public void setColumn6(String column6) {
-        Column6 = column6;
+    public void setOrderDate(String orderDate) {
+        OrderDate = orderDate;
     }
 
     public String getColumn11() {
@@ -290,28 +310,28 @@ public class Order {
         Column11 = column11;
     }
 
-    public String getColumn12() {
-        return Column12;
+    public String getCustomerName1() {
+        return CustomerName1;
     }
 
-    public void setColumn12(String column12) {
-        Column12 = column12;
+    public void setCustomerName1(String customerName1) {
+        CustomerName1 = customerName1;
     }
 
-    public String getColumn13() {
-        return Column13;
+    public String getCustomerName2() {
+        return CustomerName2;
     }
 
-    public void setColumn13(String column13) {
-        Column13 = column13;
+    public void setCustomerName2(String customerName2) {
+        CustomerName2 = customerName2;
     }
 
-    public String getColumn14() {
-        return Column14;
+    public String getAddressLine1() {
+        return AddressLine1;
     }
 
-    public void setColumn14(String column14) {
-        Column14 = column14;
+    public void setAddressLine1(String addressLine1) {
+        AddressLine1 = addressLine1;
     }
 
     public String getColumn15() {
@@ -330,36 +350,36 @@ public class Order {
         Column16 = column16;
     }
 
-    public String getColumn17() {
-        return Column17;
+    public String getCity() {
+        return City;
     }
 
-    public void setColumn17(String column17) {
-        Column17 = column17;
+    public void setCity(String city) {
+        City = city;
     }
 
-    public String getColumn18() {
-        return Column18;
+    public String getState() {
+        return State;
     }
 
-    public void setColumn18(String column18) {
-        Column18 = column18;
+    public void setState(String state) {
+        State = state;
     }
 
-    public String getColumn19() {
-        return Column19;
+    public String getZipCode() {
+        return ZipCode;
     }
 
-    public void setColumn19(String column19) {
-        Column19 = column19;
+    public void setZipCode(String zipCode) {
+        ZipCode = zipCode;
     }
 
-    public String getColumn20() {
-        return Column20;
+    public String getCountryCode() {
+        return CountryCode;
     }
 
-    public void setColumn20(String column20) {
-        Column20 = column20;
+    public void setCountryCode(String countryCode) {
+        CountryCode = countryCode;
     }
 
     public String getColumn21() {
@@ -370,12 +390,12 @@ public class Order {
         Column21 = column21;
     }
 
-    public String getColumn22() {
-        return Column22;
+    public String getShippingCarrier() {
+        return ShippingCarrier;
     }
 
-    public void setColumn22(String column22) {
-        Column22 = column22;
+    public void setShippingCarrier(String shippingCarrier) {
+        ShippingCarrier = shippingCarrier;
     }
 
 }

@@ -39,11 +39,12 @@ public class WeditorApplication extends Application {
     private final String fileFilter = "*.err";
     private final String FILE_OKAY = "File is Okay.";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
-    private Table table;
+    private Table table, processingTable;
     private TextArea fileEditor;
     private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
     private Button moveButton;
+    private TextArea processingQueueFileContent;
 
     @Override
     public void init() {
@@ -122,6 +123,7 @@ public class WeditorApplication extends Application {
                             line = br.readLine();
                         }
                         fileEditor.setValue(sb.toString());
+                        processingQueueFileContent.setValue(sb.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -147,9 +149,37 @@ public class WeditorApplication extends Application {
 
         // -------------------------------------------------------------------------------------------------------------
         FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
-        Table processingTable = new Table("Re-processing queue", fc);
+        processingTable = new Table("Re-processing queue", fc);
         processingTable.setSizeFull();
         processingTable.setSelectable(true);
+
+        processingTable.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (null != processingTable.getValue()) {
+                    Object rowId = event.getProperty().getValue();
+                    BufferedReader br = null;
+                    String selectedOutFile;
+                    try {
+                        selectedOutFile = outFileDir + processingTable.getContainerProperty(rowId, "NAME").getValue();
+                        br = new BufferedReader(new FileReader(selectedOutFile));
+                        StringBuilder sb = new StringBuilder();
+                        String line = br.readLine();
+
+                        getMainWindow().showNotification(selectedOutFile);
+                        while (line != null) {
+                            sb.append(line);
+                            sb.append("\n");
+                            line = br.readLine();
+                        }
+                        processingQueueFileContent.setValue(sb.toString());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
         // -------------------------------------------------------------------------------------------------------------
         fileEditor = new com.vaadin.ui.TextArea("FIle content");
@@ -258,17 +288,18 @@ public class WeditorApplication extends Application {
         HorizontalSplitPanel processingSplit = new HorizontalSplitPanel();
         processingSplit.addComponent(processingTable);
 
-        TextArea processingQueueFileContent = new com.vaadin.ui.TextArea("File Contents");
+        processingQueueFileContent = new com.vaadin.ui.TextArea("File Contents");
         processingQueueFileContent.setSizeFull();
         processingSplit.addComponent(processingQueueFileContent);
+
 
         processingSplit.setSplitPosition(40, Sizeable.UNITS_PERCENTAGE);
         processingSplit.setCaption("Processing queue");
 
-
         verticalLayout.addComponent(processingSplit);
         processingSplit.setMargin(true);
 
+        // and the bottom
         verticalLayout.addComponent(new BottomPanel());
 
         verticalLayout.setMargin(true);
@@ -276,7 +307,11 @@ public class WeditorApplication extends Application {
         verticalLayout.setHeight("100%");
         verticalLayout.setExpandRatio(t, 1);
         verticalLayout.setExpandRatio(split, 4);
-        verticalLayout.setExpandRatio(processingSplit, 8.8f);
+        verticalLayout.setExpandRatio(processingSplit, 2.8f);
+
+
+        TabSheet tabsheet = new TabSheet();
+
 
         mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
@@ -295,7 +330,7 @@ public class WeditorApplication extends Application {
         FileFilter ff = new WildcardFileFilter(fileFilter);
         File[] list = root.listFiles(ff);
 
-        List<String> fileList = new ArrayList<String>();
+        List<String> fileList = new ArrayList<String>(3);
 
         for (File f : list) {
             fileList.add(f.getName());

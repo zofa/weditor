@@ -37,21 +37,21 @@ public class OrderTester {
         assertNotNull(fixture.getColumn2());
         assertNotNull(fixture.getColumn3());
         assertNotNull(fixture.getColumn4());
-        assertNotNull(fixture.getColumn5());
-        assertNotNull(fixture.getColumn6());
-        assertNotNull(fixture.getColumn7());
-        assertNotNull(fixture.getColumn8());
-        assertNotNull(fixture.getColumn9());
+        assertNotNull(fixture.getPONum());
+        assertNotNull(fixture.getOrderDate());
+        assertNotNull(fixture.getDealerCol7());
+        assertNotNull(fixture.getCurrency());
+        assertNotNull(fixture.getDealerCol9());
         assertNotNull(fixture.getColumn10());
         assertNotNull(fixture.getColumn11());
-        assertNotNull(fixture.getColumn12());
-        assertNotNull(fixture.getColumn13());
-        assertNotNull(fixture.getColumn14());
+        assertNotNull(fixture.getCustomerName1());
+        assertNotNull(fixture.getCustomerName2());
+        assertNotNull(fixture.getAddressLine1());
         assertNotNull(fixture.getColumn15());
         assertNotNull(fixture.getColumn16());
-        assertNotNull(fixture.getColumn17());
-        assertNotNull(fixture.getColumn18());
-        assertNotNull(fixture.getColumn19());
+        assertNotNull(fixture.getCity());
+        assertNotNull(fixture.getState());
+        assertNotNull(fixture.getZipCode());
     }
 
     @Test

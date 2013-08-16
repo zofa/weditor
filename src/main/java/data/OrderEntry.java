@@ -22,8 +22,8 @@ public class OrderEntry {
     String sageId;
     String sku;
     String column4;
-    String column5;
-    String column6;
+    String Qty;
+    String Price;
     Properties props;
     private String SPLITTER = "|";
     private Connection connect = null;
@@ -39,8 +39,8 @@ public class OrderEntry {
             this.setSageId(record[1]); // sku
             this.setSku(record[2]);
             this.setColumn4(record[3]);
-            this.setColumn5(record[4]);
-            this.setColumn6(record[5]);
+            this.setQty(record[4]);
+            this.setPrice(record[5]);
 
             //dbConnect();
         } else {
@@ -92,9 +92,9 @@ public class OrderEntry {
                         ||
                         isNullOrEmpty(getColumn4())
                         ||
-                        isNullOrEmpty(getColumn5())
+                        isNullOrEmpty(getQty())
                         ||
-                        isNullOrEmpty(getColumn6())
+                        isNullOrEmpty(getPrice())
                 )
 
         {
@@ -197,8 +197,8 @@ public class OrderEntry {
                 getSageId() + splitter +
                 getSku() + splitter +
                 getColumn4() + splitter +
-                getColumn5() + splitter +
-                getColumn6() + splitter;
+                getQty() + splitter +
+                getPrice() + splitter;
     }
 
     public String getSplitter() {
@@ -241,19 +241,19 @@ public class OrderEntry {
         this.column4 = column4;
     }
 
-    public String getColumn5() {
-        return column5;
+    public String getQty() {
+        return Qty;
     }
 
-    public void setColumn5(String column5) {
-        this.column5 = column5;
+    public void setQty(String qty) {
+        this.Qty = qty;
     }
 
-    public String getColumn6() {
-        return column6;
+    public String getPrice() {
+        return Price;
     }
 
-    public void setColumn6(String column6) {
-        this.column6 = column6;
+    public void setPrice(String price) {
+        this.Price = price;
     }
 }
