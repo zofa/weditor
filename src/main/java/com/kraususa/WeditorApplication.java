@@ -6,9 +6,9 @@ package com.kraususa;
 
 import com.kraususa.widgetset.BottomPanel;
 import com.kraususa.widgetset.TopPanel;
+import com.kraususa.widgetset.processingQueueWidget;
 import com.vaadin.Application;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -35,16 +35,16 @@ public class WeditorApplication extends Application {
      *
      */
     private static final long serialVersionUID = 3601221463880485916L;
+
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
     private final String fileFilter = "*.err";
     private final String FILE_OKAY = "File is Okay.";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
-    private Table table, processingTable;
+    private Table table;
     private TextArea fileEditor;
     private Button saveAndMoveButton, saveButton, fixButton;
     private String selectedFile = null;
     private Button moveButton;
-    private TextArea processingQueueFileContent;
 
     @Override
     public void init() {
@@ -123,7 +123,6 @@ public class WeditorApplication extends Application {
                             line = br.readLine();
                         }
                         fileEditor.setValue(sb.toString());
-                        processingQueueFileContent.setValue(sb.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -148,38 +147,39 @@ public class WeditorApplication extends Application {
         });
 
         // -------------------------------------------------------------------------------------------------------------
-        FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
-        processingTable = new Table("Re-processing queue", fc);
-        processingTable.setSizeFull();
-        processingTable.setSelectable(true);
+//        FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
+//        processingTable = new Table("Re-processing queue", fc);
+//        processingTable.setSizeFull();
+//        processingTable.setSelectable(true);
+//
+//        processingTable.addListener(new Property.ValueChangeListener() {
+//            @Override
+//            public void valueChange(Property.ValueChangeEvent event) {
+//                if (null != processingTable.getValue()) {
+//                    Object rowId = event.getProperty().getValue();
+//                    BufferedReader br = null;
+//                    String selectedOutFile;
+//                    try {
+//                        selectedOutFile = outFileDir + processingTable.getContainerProperty(rowId, "NAME").getValue();
+//                        br = new BufferedReader(new FileReader(selectedOutFile));
+//                        StringBuilder sb = new StringBuilder();
+//                        String line = br.readLine();
+//
+//                        getMainWindow().showNotification(selectedOutFile);
+//                        while (line != null) {
+//                            sb.append(line);
+//                            sb.append("\n");
+//                            line = br.readLine();
+//                        }
+//                        processingQueueFileContent.setValue(sb.toString());
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
 
-        processingTable.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (null != processingTable.getValue()) {
-                    Object rowId = event.getProperty().getValue();
-                    BufferedReader br = null;
-                    String selectedOutFile;
-                    try {
-                        selectedOutFile = outFileDir + processingTable.getContainerProperty(rowId, "NAME").getValue();
-                        br = new BufferedReader(new FileReader(selectedOutFile));
-                        StringBuilder sb = new StringBuilder();
-                        String line = br.readLine();
-
-                        getMainWindow().showNotification(selectedOutFile);
-                        while (line != null) {
-                            sb.append(line);
-                            sb.append("\n");
-                            line = br.readLine();
-                        }
-                        processingQueueFileContent.setValue(sb.toString());
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
 
         // -------------------------------------------------------------------------------------------------------------
         fileEditor = new com.vaadin.ui.TextArea("FIle content");
@@ -192,7 +192,6 @@ public class WeditorApplication extends Application {
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
         FieldEvents.TextChangeListener inputEventListener = new
-
                 FieldEvents.TextChangeListener() {
                     @Override
                     public void textChange(FieldEvents.TextChangeEvent event) {
@@ -227,6 +226,7 @@ public class WeditorApplication extends Application {
         });
 
         fixButton = new Button("Fix selected");
+        fixButton.setEnabled(false);
         fixButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -237,6 +237,7 @@ public class WeditorApplication extends Application {
         });
 
         moveButton = new Button("Move file");
+        moveButton.setEnabled(false);
         moveButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -285,30 +286,22 @@ public class WeditorApplication extends Application {
 
         // -------------------------------------------------------------
         // Processing information
-        HorizontalSplitPanel processingSplit = new HorizontalSplitPanel();
-        processingSplit.addComponent(processingTable);
-
-        processingQueueFileContent = new com.vaadin.ui.TextArea("File Contents");
-        processingQueueFileContent.setSizeFull();
-        processingSplit.addComponent(processingQueueFileContent);
-
-
-        processingSplit.setSplitPosition(40, Sizeable.UNITS_PERCENTAGE);
-        processingSplit.setCaption("Processing queue");
-
-        verticalLayout.addComponent(processingSplit);
-        processingSplit.setMargin(true);
+        processingQueueWidget psw = new processingQueueWidget();
+        psw.setSizeFull();
+        verticalLayout.addComponent(psw);
+//
 
         // and the bottom
-        verticalLayout.addComponent(new BottomPanel());
+        BottomPanel bottom = new BottomPanel();
+        verticalLayout.addComponent(bottom);
 
         verticalLayout.setMargin(true);
         verticalLayout.setWidth("100%");
         verticalLayout.setHeight("100%");
-        verticalLayout.setExpandRatio(t, 1);
+        verticalLayout.setExpandRatio(t, 0);
         verticalLayout.setExpandRatio(split, 4);
-        verticalLayout.setExpandRatio(processingSplit, 2.8f);
-
+        verticalLayout.setExpandRatio(psw, 4);
+        verticalLayout.setExpandRatio(bottom, 0);
 
         TabSheet tabsheet = new TabSheet();
 
