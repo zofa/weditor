@@ -59,6 +59,7 @@ public class processingQueueWidget extends CustomComponent {
         hSplitPanel.setWidth("100.0%");
         hSplitPanel.setHeight("100.0%");
         hSplitPanel.setMargin(false);
+        hSplitPanel.setCaption("Files on the queue for processing.");
 
         // processingTable
         FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
