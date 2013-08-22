@@ -35,7 +35,6 @@ public class WeditorApplication extends Application {
      *
      */
     private static final long serialVersionUID = 3601221463880485916L;
-
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
     private final String fileFilter = "*.err";
     private final String FILE_OKAY = "File is Okay.";
@@ -145,42 +144,6 @@ public class WeditorApplication extends Application {
                 }
             }
         });
-
-        // -------------------------------------------------------------------------------------------------------------
-//        FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
-//        processingTable = new Table("Re-processing queue", fc);
-//        processingTable.setSizeFull();
-//        processingTable.setSelectable(true);
-//
-//        processingTable.addListener(new Property.ValueChangeListener() {
-//            @Override
-//            public void valueChange(Property.ValueChangeEvent event) {
-//                if (null != processingTable.getValue()) {
-//                    Object rowId = event.getProperty().getValue();
-//                    BufferedReader br = null;
-//                    String selectedOutFile;
-//                    try {
-//                        selectedOutFile = outFileDir + processingTable.getContainerProperty(rowId, "NAME").getValue();
-//                        br = new BufferedReader(new FileReader(selectedOutFile));
-//                        StringBuilder sb = new StringBuilder();
-//                        String line = br.readLine();
-//
-//                        getMainWindow().showNotification(selectedOutFile);
-//                        while (line != null) {
-//                            sb.append(line);
-//                            sb.append("\n");
-//                            line = br.readLine();
-//                        }
-//                        processingQueueFileContent.setValue(sb.toString());
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-
-
         // -------------------------------------------------------------------------------------------------------------
         fileEditor = new com.vaadin.ui.TextArea("FIle content");
         fileEditor.setWidth("70%");
@@ -192,6 +155,7 @@ public class WeditorApplication extends Application {
         fileEditor.setImmediate(true);
         fileEditor.setWordwrap(false);
         FieldEvents.TextChangeListener inputEventListener = new
+
                 FieldEvents.TextChangeListener() {
                     @Override
                     public void textChange(FieldEvents.TextChangeEvent event) {
@@ -230,8 +194,7 @@ public class WeditorApplication extends Application {
         fixButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                // getMainWindow().showNotification("TODO:To be implemented", Window.Notification.TYPE_WARNING_MESSAGE);
-                logger.info("Trying to fix file..");
+                logger.info("Trying to fix file " + selectedFile);
                 fixEntry();
             }
         });
@@ -328,6 +291,8 @@ public class WeditorApplication extends Application {
         for (File f : list) {
             fileList.add(f.getName());
         }
+        logger.info("Following files has been found:");
+        logger.info(fileList.toString());
         return fileList;
     }
 
@@ -379,7 +344,6 @@ public class WeditorApplication extends Application {
      * @param fileName should be exactly file name only.
      */
     protected void moveFile(String fileName) {
-
         logger.info("About to move file " + fileName + " to output directory.");
         File theFile = new File(fileName);
         if (!theFile.renameTo(new File(outFileDir + theFile.getName()))) {
@@ -399,6 +363,7 @@ public class WeditorApplication extends Application {
         String status = null;
         if (!isNullOrEmpty(selectedFile) && !fileEditor.getValue().toString().isEmpty()) {
             try {
+                logger.info("Save triggered. Saving file " + selectedFile + (move ? " with further moving to output directory." : " with no further move."));
                 // overwriting existing file
                 FileWriter fw = new FileWriter(selectedFile, false);
                 fw.append((String) fileEditor.getValue());
@@ -408,6 +373,7 @@ public class WeditorApplication extends Application {
                     moveFile(selectedFile);
             } catch (IOException e) {
                 status = e.getMessage();
+                logger.error("Cannot properly save the file. Error cause follows: " + e.getCause());
             }
 
         } else {
