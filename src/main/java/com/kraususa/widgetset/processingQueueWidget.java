@@ -112,6 +112,7 @@ public class processingQueueWidget extends CustomComponent {
         fileContainText.setWidth("100.0%");
         fileContainText.setHeight("100.0%");
         fileContainText.setReadOnly(true);
+        fileContainText.setWordwrap(false);
         hSplitPanel.addComponent(filesInQueueTable);
         hSplitPanel.addComponent(fileContainText);
 
