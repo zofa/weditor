@@ -4,7 +4,7 @@
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
     <packaging>war</packaging>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
     <name>weditor</name>
 
     <url>http://dev-web:8080/weditor</url>
