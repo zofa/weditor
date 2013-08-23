@@ -1,3 +1,5 @@
 #!/bin/sh
 
-mvn -T 3C clean release:prepare release:perform tomcat:redeploy
+mvn release:prepare release:perform tomcat:redeploy
+
+git gc
