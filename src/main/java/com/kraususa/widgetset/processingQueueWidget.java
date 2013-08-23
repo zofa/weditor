@@ -18,7 +18,7 @@ public class processingQueueWidget extends CustomComponent {
     private HorizontalLayout mainLayout;
     private HorizontalSplitPanel hSplitPanel;
     private TextArea fileContainText;
-    private Table processingTable;
+    private Table filesInQueueTable;
 
     /**
      * The constructor should first build the main layout, set the
@@ -61,24 +61,32 @@ public class processingQueueWidget extends CustomComponent {
         hSplitPanel.setMargin(false);
         hSplitPanel.setCaption("Files on the queue for processing.");
 
-        // processingTable
+        // filesInQueueTable
+        logger.info("Listing output directory " + outFileDir);
+
         FilesystemContainer fc = new FilesystemContainer(new File(outFileDir));
-        processingTable = new Table("Re-processing queue", fc);
-        processingTable.setImmediate(true);
-        processingTable.setSizeFull();
-        processingTable.setNullSelectionAllowed(false);
-        processingTable.setSelectable(true);
-        processingTable.setFooterVisible(true);
-        processingTable.setColumnCollapsingAllowed(true);
-        processingTable.addListener(new Property.ValueChangeListener() {
+        filesInQueueTable = new Table("Re-processing queue", fc);
+        if (fc.size() > 0) {
+            logger.info("found " + fc.size() + " files:");
+            //TODO: implement output of file names
+
+        }
+        filesInQueueTable.setImmediate(true);
+        filesInQueueTable.setSizeFull();
+        filesInQueueTable.setNullSelectionAllowed(false);
+        filesInQueueTable.setSelectable(true);
+        filesInQueueTable.setFooterVisible(true);
+        filesInQueueTable.setColumnCollapsingAllowed(true);
+        filesInQueueTable.setVisibleColumns(new String[]{"Name", "Last Modified"});
+        filesInQueueTable.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                if (processingTable.getValue() != null) {
+                if (filesInQueueTable.getValue() != null) {
                     Object rowId = event.getProperty().getValue();
                     BufferedReader br = null;
                     String selectedOutFile;
                     try {
-                        selectedOutFile = outFileDir + processingTable.getContainerProperty(rowId, "Name").getValue();
+                        selectedOutFile = outFileDir + filesInQueueTable.getContainerProperty(rowId, "Name").getValue();
                         br = new BufferedReader(new FileReader(selectedOutFile));
                         StringBuilder sb = new StringBuilder();
                         String line = br.readLine();
@@ -104,7 +112,7 @@ public class processingQueueWidget extends CustomComponent {
         fileContainText.setWidth("100.0%");
         fileContainText.setHeight("100.0%");
         fileContainText.setReadOnly(true);
-        hSplitPanel.addComponent(processingTable);
+        hSplitPanel.addComponent(filesInQueueTable);
         hSplitPanel.addComponent(fileContainText);
 
         return hSplitPanel;

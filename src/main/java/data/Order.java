@@ -2,6 +2,7 @@ package data;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class Order {
 
+    static Logger logger = Logger.getLogger(OrderEntry.class);
     private static final String SPLITTER = "|";
     private String Column1;
     private String Column2;
@@ -208,6 +210,7 @@ public class Order {
      * @return
      */
     public String fixOrderEntries() {
+        logger.info("Trying to fix entries in the order.");
         String status = null;
         if (orderEntries.size() != 0) {
             try {
@@ -217,6 +220,8 @@ public class Order {
             } catch (Exception e) {
                 e.printStackTrace();
                 status = e.getCause().toString();
+                logger.error("Cannot fix entry, due to: " + e.getCause());
+
             }
         }
         return status;

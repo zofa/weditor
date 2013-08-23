@@ -102,11 +102,9 @@ public class WeditorApplication extends Application {
         table.setColumnFooter("File name", "Total files");
         table.setColumnFooter("Dealer list", String.valueOf(files.size()));
 
-        final Label current = new Label("Selected: -");
         table.addListener(new Property.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (table.getValue() != null) {
-                    current.setValue("Selected: " + table.getValue());
                     Object rowId = event.getProperty().getValue();
                     BufferedReader br = null;
 
@@ -216,8 +214,10 @@ public class WeditorApplication extends Application {
         h.addComponent(saveAndMoveButton);
         h.addComponent(fixButton);
         h.addComponent(moveButton);
-
+        h.setSizeFull();
         v.addComponent(h);
+        v.setExpandRatio(h, 2);
+
         //v.setComponentAlignment(saveAndMoveButton, Alignment.BOTTOM_RIGHT);
 
         saveAndMoveButton.addListener(new Button.ClickListener() {
@@ -235,12 +235,12 @@ public class WeditorApplication extends Application {
             }
         });
         v.addComponent(fileEditor);
-        v.addComponent(current);
+
         split.addComponent(v);
         split.setCaption("Error files");
         //split.setHeight("90%");
 
-        //verticalLayout.addComponent(topLabel);
+
         TopPanel t = new TopPanel();
 
         verticalLayout.setSpacing(false);
@@ -261,13 +261,12 @@ public class WeditorApplication extends Application {
         verticalLayout.setMargin(true);
         verticalLayout.setWidth("100%");
         verticalLayout.setHeight("100%");
-        verticalLayout.setExpandRatio(t, 0);
+        verticalLayout.setExpandRatio(t, 0.8f);
         verticalLayout.setExpandRatio(split, 4);
         verticalLayout.setExpandRatio(psw, 4);
         verticalLayout.setExpandRatio(bottom, 0);
 
         TabSheet tabsheet = new TabSheet();
-
 
         mainWindow.setContent(verticalLayout);
         setMainWindow(mainWindow);
@@ -390,11 +389,13 @@ public class WeditorApplication extends Application {
      * @throws IOException
      */
     private String validateFile(String file) {
+        //TODO: move logic to class
         String errMsg = null;
         BufferedReader br = null;
         String line;
         int record = 0, dataEntry = 0;
 
+        logger.info("Validating file " + file);
         try {
             br = new BufferedReader(new FileReader(file));
             outer_loop:
@@ -450,6 +451,11 @@ public class WeditorApplication extends Application {
             System.out.println(ioEx.getMessage() + " " + ioEx.getCause());
         }
         if (errMsg == null) errMsg = FILE_OKAY;
+        if (FILE_OKAY == errMsg)
+            logger.info("File is fine.");
+        else
+            logger.info("Validation outcome follows: " + errMsg);
+
         return errMsg;
     }
 

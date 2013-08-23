@@ -191,7 +191,6 @@ public class OrderEntry {
      */
     @Override
     public String toString() {
-
         String splitter = getSplitter();
         return getMetaColumn() + splitter +
                 getSageId() + splitter +
