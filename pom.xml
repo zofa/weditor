@@ -4,7 +4,7 @@
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
     <packaging>war</packaging>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
     <name>weditor</name>
 
     <url>http://dev-web:8080/weditor</url>
@@ -53,7 +53,7 @@
         <connection>scm:git:git@github.com:zofa/weditor.git</connection>
         <url>scm:git:git@github.com:zofa/weditor.git</url>
         <developerConnection>scm:git:git@github.com:zofa/weditor.git</developerConnection>
-        <tag>weditor-1.4</tag>
+        <tag>weditor-1.5</tag>
     </scm>
 
     <distributionManagement>
