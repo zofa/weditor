@@ -17,12 +17,13 @@ public enum ErrorTypes {
     MISSING_SAGE_ID("Order entry missing SAGE_ID info");
 
     //--------------------------------------------------------
-    private static final Map<String, ErrorTypes> lookup = new HashMap<String, ErrorTypes>();
+    private static final Map<String, ErrorTypes> Lookup = new HashMap<String, ErrorTypes>();
 
-    // Reverse-lookup map for getting a day from an abbreviation
+    // Reverse-Lookup map for getting a day from an abbreviation
     static {
-        for (ErrorTypes erd : ErrorTypes.values())
-            lookup.put(erd.getAbbreviation(), erd);
+        for (ErrorTypes erd : ErrorTypes.values()) {
+            Lookup.put(erd.getAbbreviation(), erd);
+        }
     }
 
     private String abbreviation = null;
@@ -32,7 +33,7 @@ public enum ErrorTypes {
     }
 
     public static ErrorTypes get(String abbreviation) {
-        return lookup.get(abbreviation);
+        return Lookup.get(abbreviation);
     }
 
     public String getAbbreviation() {

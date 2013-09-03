@@ -37,7 +37,7 @@ public class WeditorApplication extends Application {
     private static final long serialVersionUID = 3601221463880485916L;
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
     private final String fileFilter = "*.err";
-    private final String FILE_OKAY = "File is Okay.";
+    private final String fileIsOkay = "File is Okay.";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
@@ -65,7 +65,6 @@ public class WeditorApplication extends Application {
         // -------------------------------------------------------------------------------------------------------------
         table = new Table("List of error files");
         table.addContainerProperty("File name", String.class, null);
-        // table.addContainerProperty("# of records", Integer.class, null);
         table.addContainerProperty("Dealer list", String.class, null);
         table.addContainerProperty("Errors", String.class, null);
         table.setWidth("100%");
@@ -121,12 +120,12 @@ public class WeditorApplication extends Application {
                         }
                         fileEditor.setValue(sb.toString());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     }
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
 
-                    if (table.getContainerProperty(rowId, "Errors").getValue() == FILE_OKAY) {
+                    if (table.getContainerProperty(rowId, "Errors").getValue() == fileIsOkay) {
                         moveButton.setEnabled(true);
                         fixButton.setEnabled(false);
                     } else if (table.getContainerProperty(rowId, "Errors").getValue().toString().toLowerCase().contains("mandatory fields")) {
@@ -238,7 +237,6 @@ public class WeditorApplication extends Application {
 
         split.addComponent(v);
         split.setCaption("Error files");
-        //split.setHeight("90%");
 
 
         TopPanel t = new TopPanel();
@@ -317,20 +315,20 @@ public class WeditorApplication extends Application {
                     if (!isNullOrEmpty(tmp[6]))
                         dealers.add(tmp[6]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-
+                    logger.error(e);
                 }
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -450,11 +448,12 @@ public class WeditorApplication extends Application {
             // we should not be here;
             System.out.println(ioEx.getMessage() + " " + ioEx.getCause());
         }
-        if (errMsg == null) errMsg = FILE_OKAY;
-        if (FILE_OKAY == errMsg)
+        if (errMsg == null) errMsg = fileIsOkay;
+        if (fileIsOkay == errMsg) {
             logger.info("File is fine.");
-        else
+        } else {
             logger.info("Validation outcome follows: " + errMsg);
+        }
 
         return errMsg;
     }
@@ -493,7 +492,7 @@ public class WeditorApplication extends Application {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
             // all orders are red from file.
             for (Order ord : OrdersInFile) {
@@ -505,9 +504,9 @@ public class WeditorApplication extends Application {
             }
             getMainWindow().showNotification(sb.toString(), Window.Notification.TYPE_WARNING_MESSAGE);
 
-            System.out.println("-------------------------------------------");
-            System.out.println(sb.toString());
-            System.out.println("-------------------------------------------");
+            logger.debug("-------------------------------------------");
+            logger.debug(sb.toString());
+            logger.debug("-------------------------------------------");
 
             fileEditor.setValue(sb.toString());
             getMainWindow().getApplication().close();
