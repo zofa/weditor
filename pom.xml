@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
@@ -47,6 +48,12 @@
         <maven.min-version>3.1.0</maven.min-version>
         <github.maven.repository>file:///home/z1/repository/maven-repository/</github.maven.repository>
         <timestamp>${maven.build.timestamp}</timestamp>
+
+        <!--sonar settings-->
+        <sonar.dynamicAnalysis>true</sonar.dynamicAnalysis>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
+        <sonar.language>java</sonar.language>
     </properties>
 
     <scm>
@@ -87,6 +94,8 @@
                 <configuration>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </reporting>
 
@@ -99,6 +108,31 @@
             </resource>
         </resources>
         <plugins>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <includes>*</includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -108,7 +142,6 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-
 
             <!-- Compile custom GWT components or widget dependencies with the GWT
                 compiler -->
@@ -227,6 +260,16 @@
 
 
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.6.3.201306030806</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
         <extensions>
             <extension>
