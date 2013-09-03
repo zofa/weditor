@@ -16,8 +16,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class Order {
 
+    private static final String splitter = "|";
     static Logger logger = Logger.getLogger(OrderEntry.class);
-    private static final String SPLITTER = "|";
     private String Column1;
     private String Column2;
     private String Column3; // record type
@@ -149,7 +149,11 @@ public class Order {
             sb.append(" State ");
         } else if (isNullOrEmpty(getZipCode())) {
             sb.append("ZipCode");
-            return sb.toString() == "Missing " ? "" : sb.toString();
+            if (sb.toString().equals("Missing ")) {
+                return "";
+            } else {
+                return sb.toString();
+            }
         }
         return sb.toString();
     }
@@ -165,28 +169,28 @@ public class Order {
         StringBuilder sb = new StringBuilder();
 
         sb.append(
-                getColumn1() + SPLITTER +
-                        getColumn2() + SPLITTER +
-                        getColumn3() + SPLITTER +
-                        getColumn4() + SPLITTER +
-                        getPONum() + SPLITTER +
-                        getOrderDate() + SPLITTER +
-                        getDealerCol7() + SPLITTER +
-                        getCurrency() + SPLITTER +
-                        getDealerCol9() + SPLITTER +
-                        getColumn10() + SPLITTER +
-                        getColumn11() + SPLITTER +
-                        getCustomerName1() + SPLITTER +
-                        getCustomerName2() + SPLITTER +
-                        getAddressLine1() + SPLITTER +
-                        getColumn15() + SPLITTER +
-                        getColumn16() + SPLITTER +
-                        getCity() + SPLITTER +
-                        getState() + SPLITTER +
-                        getZipCode() + SPLITTER +
-                        getCountryCode() + SPLITTER +
-                        getColumn21() + SPLITTER +
-                        getShippingCarrier() + SPLITTER + "\n");
+                getColumn1() + splitter +
+                        getColumn2() + splitter +
+                        getColumn3() + splitter +
+                        getColumn4() + splitter +
+                        getPONum() + splitter +
+                        getOrderDate() + splitter +
+                        getDealerCol7() + splitter +
+                        getCurrency() + splitter +
+                        getDealerCol9() + splitter +
+                        getColumn10() + splitter +
+                        getColumn11() + splitter +
+                        getCustomerName1() + splitter +
+                        getCustomerName2() + splitter +
+                        getAddressLine1() + splitter +
+                        getColumn15() + splitter +
+                        getColumn16() + splitter +
+                        getCity() + splitter +
+                        getState() + splitter +
+                        getZipCode() + splitter +
+                        getCountryCode() + splitter +
+                        getColumn21() + splitter +
+                        getShippingCarrier() + splitter + "\n");
 
         for (OrderEntry details : orderEntries) {
             sb.append(details.toString());
@@ -215,10 +219,14 @@ public class Order {
         if (orderEntries.size() != 0) {
             try {
                 for (OrderEntry entry : orderEntries) {
-                    entry.fixBasedOnSKUorSageID();
+                    /* this will fix based on sku and SageID if either is empty by looking up  values in db.
+                    * Any other fixer could be called here in chain.
+                    * */
+                    entry.setTheFixer(new SKUorSageIDOrderEntryFixer());
+                    entry.fixEntry();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
                 status = e.getCause().toString();
                 logger.error("Cannot fix entry, due to: " + e.getCause());
 
@@ -295,8 +303,8 @@ public class Order {
         return PONum;
     }
 
-    public void setPONum(String PONum) {
-        this.PONum = PONum;
+    public void setPonum(String Ponum) {
+        this.PONum = Ponum;
     }
 
     public String getOrderDate() {
