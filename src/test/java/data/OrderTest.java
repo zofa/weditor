@@ -1,38 +1,28 @@
 package data;
 
 
+import junit.framework.TestCase;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 
 
-/**
- * Created with IntelliJ IDEA.
- * User:
- * Date: 8/2/13
- * Time: 5:22 PM
- */
-public class OrderTester {
+public class OrderTest {
 
     private final String theOrder = "H|KRAU1|SOPRM|sdfg|259445|20130430|KRAUS001|USD|KRAUS001|SHP|20160104|Sharon Devries|Sharon Devries|1135 Westview Dr.|sdfg|sdfg|Boulder|CO|80303|sdfg|KRAU1|UPS|GND|sdfg|720-287-3947|||\n";
     private final String theOrderEntry = "D|asd|7-Sprayer-Holder-KPF-1602|EA|1|0.00|1|\n";
-    OrderEntry oe = new OrderEntry(theOrderEntry);
+    OrderEntry OrderEntryFixture = new OrderEntry(theOrderEntry);
     private Order fixture = new Order(theOrder);
 
-//    @Before
-//    OrderTester() {
-//        logging.disable(logging.CRITICAL);
-//    }
-
     @Test
-    public void testGetRecordType() throws Exception {
-
+    public void TestGetRecordType() throws Exception {
         assertNotNull(fixture.getColumn1());
     }
 
     @Test
-    public void testValidateMandatoryFields() throws Exception {
+    public void TestValidateMandatoryFields() throws Exception {
         assertNotNull(fixture.getColumn1());
         assertNotNull(fixture.getColumn2());
         assertNotNull(fixture.getColumn3());
@@ -55,34 +45,38 @@ public class OrderTester {
     }
 
     @Test
-    public void testSetRecordType() throws Exception {
-
+    public void TestSetRecordType() throws Exception {
+        fixture.setRecordType(RecordTypes.ORDER_CANCEL);
+        TestCase.assertEquals(fixture.getRecordType(), RecordTypes.ORDER_CANCEL);
+        fixture.setRecordType(RecordTypes.ORDER_INFO);
+        TestCase.assertEquals(fixture.getRecordType(), RecordTypes.ORDER_INFO);
     }
 
     @Test
-    public void testGetOrderEntries() throws Exception {
-
+    public void TestOrderEntries() throws Exception {
+        fixture.addEntry(OrderEntryFixture);
+        assertEquals(1, fixture.getOrderEntryCount());
+        TestCase.assertEquals(OrderEntryFixture.toString(), fixture.getOrderEntry(0));
     }
 
     @Test
-    public void testValidateOrder() throws Exception {
+    public void TestValidateOrder() throws Exception {
         assertNull(fixture.validateOrder());
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void TestToString() throws Exception {
         assertNotNull(fixture.toString());
+        // assertEquals(theOrder , fixture.toString());
     }
 
     @Test
-    public void testValidateOrderEntries() throws Exception {
+    public void TestValidateOrderEntries() throws Exception {
 
     }
 
     @Test
-    public void testFixOrderEntries() throws Exception {
+    public void TestFixOrderEntries() throws Exception {
 
     }
-
-
 }

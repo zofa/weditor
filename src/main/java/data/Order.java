@@ -149,14 +149,15 @@ public class Order {
             sb.append(" State ");
         } else if (isNullOrEmpty(getZipCode())) {
             sb.append("ZipCode");
-            if (sb.toString().equals("Missing ")) {
-                return "";
-            } else {
-                return sb.toString();
-            }
         }
-        return sb.toString();
+
+        if ("Missing ".equals(sb.toString())) {
+            return null;
+        } else {
+            return sb.toString();
+        }
     }
+
 
     /**
      * Returns original string representation of the record including order entries.
@@ -197,15 +198,6 @@ public class Order {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-    /**
-     * @return
-     */
-
-    public String validateOrderEntries() {
-
-        return null;
     }
 
     /**
@@ -409,6 +401,14 @@ public class Order {
 
     public void setShippingCarrier(String shippingCarrier) {
         ShippingCarrier = shippingCarrier;
+    }
+
+    public String getOrderEntry(int index) {
+        return orderEntries.get(index).toString();
+    }
+
+    public int getOrderEntryCount() {
+        return orderEntries.size();
     }
 
 }
