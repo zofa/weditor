@@ -85,6 +85,8 @@ public class SKUorSageIDOrderEntryFixer implements OrderEntryFixer {
         } catch (SQLException e) {
             logger.error(e);
         }
+        logger.info("Entry after fix follows");
+        logger.info(theEntry);
         return theEntry;
     }
 

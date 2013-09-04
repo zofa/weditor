@@ -37,7 +37,6 @@ public class WeditorApplication extends Application {
     private static final long serialVersionUID = 3601221463880485916L;
     private static Logger logger = Logger.getLogger(WeditorApplication.class);
     private final String fileFilter = "*.err";
-    private final String fileIsOkay = "File is Okay.";
     protected String inFileDir = "/errfiles/infiles/", outFileDir = "/errfiles/outfiles/";
     private Table table;
     private TextArea fileEditor;
@@ -59,7 +58,6 @@ public class WeditorApplication extends Application {
             }
         });
 
-        HorizontalLayout hLayout = new HorizontalLayout();
         VerticalLayout verticalLayout = new VerticalLayout();
         logger.info("Initializing the application.");
         // -------------------------------------------------------------------------------------------------------------
@@ -78,25 +76,24 @@ public class WeditorApplication extends Application {
 
         List<String> files = new ArrayList<String>(10);
 
-        if (files != null) {
-            files.addAll(this.listFiles(inFileDir));
-            if (!files.isEmpty()) {
-                for (int i = 0; i < files.size(); i++) {
-                    String theDealers = this.getDealersList(inFileDir + files.get(i)).toString();
-                    table.addItem(new Object[]
-                            {
-                                    files.get(i),
-                                    // this.getDealersList(inFileDir + files.get(i)).size(),
-                                    //  "",
-                                    theDealers,
-                                    // "Fix & sumbit"
-                                    validateFile(inFileDir + files.get(i))
-                            }, new Integer(i));
-                }
+        files.addAll(this.listFiles(inFileDir));
+        if (!files.isEmpty()) {
+            for (int i = 0; i < files.size(); i++) {
+                String theDealers = this.getDealersList(inFileDir + files.get(i)).toString();
+                table.addItem(new Object[]
+                        {
+                                files.get(i),
+                                // this.getDealersList(inFileDir + files.get(i)).size(),
+                                //  "",
+                                theDealers,
+                                // "Fix & sumbit"
+                                validateFile(inFileDir + files.get(i))
+                        }, new Integer(i));
             }
-        } else {
-            mainWindow.showNotification("Error", "Cannot obtain file list");
         }
+
+        //mainWindow.showNotification("Error", "Cannot obtain file list", Window.Notification.TYPE_TRAY_NOTIFICATION);
+
 
         table.setColumnFooter("File name", "Total files");
         table.setColumnFooter("Dealer list", String.valueOf(files.size()));
@@ -105,7 +102,7 @@ public class WeditorApplication extends Application {
             public void valueChange(Property.ValueChangeEvent event) {
                 if (table.getValue() != null) {
                     Object rowId = event.getProperty().getValue();
-                    BufferedReader br = null;
+                    BufferedReader br;
 
                     try {
                         selectedFile = inFileDir + table.getContainerProperty(rowId, "File name").getValue();
@@ -125,7 +122,7 @@ public class WeditorApplication extends Application {
                     saveButton.setEnabled(false);
                     saveAndMoveButton.setEnabled(false);
 
-                    if (table.getContainerProperty(rowId, "Errors").getValue() == fileIsOkay) {
+                    if (isNullOrEmpty(table.getContainerProperty(rowId, "Errors").getValue().toString())) {
                         moveButton.setEnabled(true);
                         fixButton.setEnabled(false);
                     } else if (table.getContainerProperty(rowId, "Errors").getValue().toString().toLowerCase().contains("mandatory fields")) {
@@ -181,8 +178,13 @@ public class WeditorApplication extends Application {
                 getMainWindow().getApplication().close();
                 logger.info("Saving file " + selectedFile);
                 getMainWindow().showNotification(doSave(false));
-                getMainWindow().showNotification("Changes saved to file");
-                logger.info("File changes saved.");
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+                getMainWindow().showNotification("Changes saved to file", Window.Notification.TYPE_TRAY_NOTIFICATION);
+                logger.info("Changes saved to file.");
             }
         });
 
@@ -264,10 +266,15 @@ public class WeditorApplication extends Application {
         verticalLayout.setExpandRatio(psw, 4);
         verticalLayout.setExpandRatio(bottom, 0);
 
-        TabSheet tabsheet = new TabSheet();
+        // TabSheet tabsheet = new TabSheet();
 
         mainWindow.setContent(verticalLayout);
+
+
         setMainWindow(mainWindow);
+
+        //  setMainWindow(new LoginWindow());
+
     }
 
     /**
@@ -347,6 +354,8 @@ public class WeditorApplication extends Application {
             getMainWindow().getApplication().close();
             getMainWindow().showNotification("Failed to move file. See log for details. Either file exists or permission denied.", Window.Notification.TYPE_ERROR_MESSAGE);
             logger.error("Unable to move file " + fileName);
+        } else {
+            logger.info("File " + fileName + " moved to output directory.");
         }
     }
 
@@ -357,7 +366,7 @@ public class WeditorApplication extends Application {
      * @return null when everything is okay and error msg when something went wrong.
      */
     public String doSave(boolean move) {
-        String status = null;
+        String status;
         if (!isNullOrEmpty(selectedFile) && !fileEditor.getValue().toString().isEmpty()) {
             try {
                 logger.info("Save triggered. Saving file " + selectedFile + (move ? " with further moving to output directory." : " with no further move."));
@@ -389,11 +398,10 @@ public class WeditorApplication extends Application {
     private String validateFile(String file) {
         //TODO: move logic to class
         String errMsg = null;
-        BufferedReader br = null;
+        BufferedReader br;
         String line;
         int record = 0, dataEntry = 0;
 
-        logger.info("Validating file " + file);
         try {
             br = new BufferedReader(new FileReader(file));
             outer_loop:
@@ -446,15 +454,8 @@ public class WeditorApplication extends Application {
             }
         } catch (IOException ioEx) {
             // we should not be here;
-            System.out.println(ioEx.getMessage() + " " + ioEx.getCause());
+            logger.error(ioEx);
         }
-        if (errMsg == null) errMsg = fileIsOkay;
-        if (fileIsOkay == errMsg) {
-            logger.info("File is fine.");
-        } else {
-            logger.info("Validation outcome follows: " + errMsg);
-        }
-
         return errMsg;
     }
 
@@ -465,21 +466,15 @@ public class WeditorApplication extends Application {
     private String fixEntry() {
         String status = null;
         //Object rowId = null;
-
-        if (!isNullOrEmpty(selectedFile)
-            // &&
-            // (table.getItemIconPropertyId("Errors").getValue().toString().contains("Missing SKU") ||
-            //         table.getContainerProperty(rowId, "Errors").getValue().toString().contains("Missing sage_id")
-            // )
-                ) {
+        getMainWindow().showNotification("", Window.Notification.TYPE_ERROR_MESSAGE);
+        if (!isNullOrEmpty(selectedFile)) {
             BufferedReader br;
-            String line, errMsg;
+            String line;
             List<Order> OrdersInFile = new ArrayList<Order>(2);
             try {
-
                 br = new BufferedReader(new FileReader(selectedFile));
-                OrderEntry orderEntry = null;
-                Order order = null;
+                OrderEntry orderEntry;
+                Order order;
 
                 while ((line = br.readLine()) != null) {
                     while (line != null && line.startsWith("H")) {
@@ -502,7 +497,6 @@ public class WeditorApplication extends Application {
             for (Order ord : OrdersInFile) {
                 sb.append(ord.toString());
             }
-            getMainWindow().showNotification(sb.toString(), Window.Notification.TYPE_WARNING_MESSAGE);
 
             logger.debug("-------------------------------------------");
             logger.debug(sb.toString());
@@ -510,7 +504,7 @@ public class WeditorApplication extends Application {
 
             fileEditor.setValue(sb.toString());
             getMainWindow().getApplication().close();
-            getMainWindow().showNotification(doSave(false));
+            getMainWindow().showNotification(doSave(false), Window.Notification.TYPE_TRAY_NOTIFICATION);
         }
         return status;
     }

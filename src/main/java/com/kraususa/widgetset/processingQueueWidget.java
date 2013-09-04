@@ -38,11 +38,11 @@ public class processingQueueWidget extends CustomComponent {
         mainLayout = new HorizontalLayout();
         mainLayout.setImmediate(false);
         mainLayout.setSizeFull();
-        mainLayout.setMargin(true);
+        mainLayout.setMargin(false);
 
         // top-level component properties
-        setWidth("80.0%");
-        setHeight("80.0%");
+        setWidth("100.0%");
+        setHeight("100.0%");
 
         // mainLayout.addComponent(new Label("Files in the processing queue."));
 
@@ -58,6 +58,7 @@ public class processingQueueWidget extends CustomComponent {
         hSplitPanel.setImmediate(false);
         hSplitPanel.setWidth("100.0%");
         hSplitPanel.setHeight("100.0%");
+        hSplitPanel.setSplitPosition(30);
         hSplitPanel.setMargin(false);
         hSplitPanel.setCaption("Files on the queue for processing.");
 
@@ -69,7 +70,6 @@ public class processingQueueWidget extends CustomComponent {
         if (fc.size() > 0) {
             logger.info("found " + fc.size() + " files:");
             //TODO: implement output of file names
-
         }
         filesInQueueTable.setImmediate(true);
         filesInQueueTable.setSizeFull();

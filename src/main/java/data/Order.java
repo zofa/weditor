@@ -195,7 +195,8 @@ public class Order {
 
         for (OrderEntry details : orderEntries) {
             sb.append(details.toString());
-            sb.append("\n");
+            /* windows windows windows EOL :0*/
+            sb.append("\r\n");
         }
         return sb.toString();
     }

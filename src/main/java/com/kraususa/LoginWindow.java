@@ -1,8 +1,8 @@
 package com.kraususa;
 
 
-import com.vaadin.ui.Button;
 import com.vaadin.ui.*;
+import org.apache.log4j.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,25 +13,31 @@ import com.vaadin.ui.*;
  */
 public class LoginWindow extends Window {
 
+    private static Logger logger = Logger.getLogger(LoginWindow.class);
+
     private Button btnLogin = new Button("Login");
-    private TextField login = new TextField ( "Username");
-    private PasswordField password = new PasswordField ( "Password");
+    private TextField login = new TextField("Username");
+    private PasswordField password = new PasswordField("Password");
 
 
-    public LoginWindow ()
-    {
+    public LoginWindow() {
         super("Authentication Required !");
-        setName ( "login" );
+        setName("login");
         initUI();
     }
 
-    private void initUI ()
-    {
-        addComponent ( new Label ("Please login in order to use the application") );
-        addComponent ( new Label () );
-        addComponent ( login );
-        addComponent ( password );
-        addComponent ( btnLogin );
+    private void initUI() {
+        addComponent(new Label("Please login in order to use the application"));
+        addComponent(new Label());
+        addComponent(login);
+        addComponent(password);
+        addComponent(btnLogin);
+        btnLogin.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                setContent(new MainWindow());
+            }
+        });
     }
 
 
