@@ -345,7 +345,7 @@ public class WeditorApplication extends Application {
     }
 
     /**
-     * Moves @filename the file from input to output directory.
+     * Moves @filename the file from input to output directory across the file systems.
      *
      * @param fileName should be exactly file name only.
      */
@@ -354,8 +354,10 @@ public class WeditorApplication extends Application {
         File theFile = new File(fileName);
         checkNotNull(fileName, "Move source file name must NOT be null.");
 
-        if (!theFile.renameTo(new File(outFileDir + theFile.getName()))) {
-            File targetFile = new File(outFileDir + theFile.getName());
+        String TargetFileName = theFile.getName().substring(0, theFile.getName().length() - 4);
+
+        if (!theFile.renameTo(new File(outFileDir + TargetFileName))) {
+            File targetFile = new File(outFileDir + TargetFileName);
             try {
                 Files.move(theFile, targetFile);
             } catch (IOException e) {
