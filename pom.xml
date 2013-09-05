@@ -45,7 +45,7 @@
         <vaadin.version>6.8.2</vaadin.version>
         <gwt.version>2.3.0</gwt.version>
         <gwt.plugin.version>2.2.0</gwt.plugin.version>
-        <maven.min-version>3.0.5</maven.min-version>
+        <maven.min-version>3.1.0</maven.min-version>
         <github.maven.repository>file:///home/z1/repository/maven-repository/</github.maven.repository>
         <timestamp>${maven.build.timestamp}</timestamp>
 
