@@ -26,7 +26,7 @@ public class SKUorSageIDOrderEntryFixer implements OrderEntryFixer {
 
         OrderEntry theEntry = entry;
 
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         String tmp;
 
         logger.info("About to fix an order entry with - " + this.getClass().getName());
@@ -84,6 +84,12 @@ public class SKUorSageIDOrderEntryFixer implements OrderEntryFixer {
             }
         } catch (SQLException e) {
             logger.error(e);
+        } finally {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                logger.error(e);
+            }
         }
         logger.info("Entry after fix follows");
         logger.info(theEntry);
