@@ -4,6 +4,7 @@
 package com.kraususa;
 
 
+import com.google.common.io.Files;
 import com.kraususa.widgetset.BottomPanel;
 import com.kraususa.widgetset.TopPanel;
 import com.kraususa.widgetset.processingQueueWidget;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 
@@ -350,12 +352,21 @@ public class WeditorApplication extends Application {
     protected void moveFile(String fileName) {
         logger.info("About to move file " + fileName + " to output directory.");
         File theFile = new File(fileName);
+        checkNotNull(fileName, "Move source file name must NOT be null.");
+
         if (!theFile.renameTo(new File(outFileDir + theFile.getName()))) {
+            File targetFile = new File(outFileDir + theFile.getName());
+            try {
+                Files.move(theFile, targetFile);
+            } catch (IOException e) {
+                logger.error(e);
+                getMainWindow().showNotification("Failed to move file. See log for details. Either file exists or permission denied.", Window.Notification.TYPE_ERROR_MESSAGE);
+            }
             getMainWindow().getApplication().close();
-            getMainWindow().showNotification("Failed to move file. See log for details. Either file exists or permission denied.", Window.Notification.TYPE_ERROR_MESSAGE);
-            logger.error("Unable to move file " + fileName);
+            logger.error("Unable to move file " + fileName + " to " + outFileDir + theFile.getName());
         } else {
             logger.info("File " + fileName + " moved to output directory.");
+            getMainWindow().getApplication().close();
         }
     }
 
