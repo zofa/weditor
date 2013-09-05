@@ -115,8 +115,7 @@ public class Order {
 
         if (isNullOrEmpty(getColumn1()) ||
                 isNullOrEmpty(getColumn2()) ||
-                isNullOrEmpty(getColumn3()) ||
-                isNullOrEmpty(getColumn4())
+                isNullOrEmpty(getColumn3())
                 ) {
             sb.append("first 4th columns, ");
         } else if (isNullOrEmpty(getPONum())) {
@@ -137,10 +136,10 @@ public class Order {
         }
         if (isNullOrEmpty(getCustomerName2())) {
             sb.append(" Customer Name1 ");
-        } else if (isNullOrEmpty(getAddressLine1()) ||
-                isNullOrEmpty(getColumn15()) ||
-                isNullOrEmpty(getColumn16())) {
-            sb.append(" Columns 15, 16");
+//        } else if (isNullOrEmpty(getAddressLine1()) ||
+//                isNullOrEmpty(getColumn15()) ||
+//                isNullOrEmpty(getColumn16())) {
+//            sb.append(" Columns 15, 16");
         } else if (
                 isNullOrEmpty(getCity())) {
             sb.append(" City");
