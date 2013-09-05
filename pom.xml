@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
@@ -53,6 +54,7 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
         <sonar.language>java</sonar.language>
+        <sonar.host.url>http://dev-web:9000</sonar.host.url>
     </properties>
 
     <scm>
@@ -86,6 +88,7 @@
 
     <reporting>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -95,8 +98,15 @@
             </plugin>
 
 
+            <plugin>
+                <groupId>org.codehaus.sonar-plugins</groupId>
+                <artifactId>maven-report</artifactId>
+                <version>0.1</version>
+            </plugin>
+
         </plugins>
     </reporting>
+
 
     <build>
         <!--for saving version info in the props file.-->
@@ -285,6 +295,7 @@
         </extensions>
     </build>
 
+
     <repositories>
         <repository>
             <id>vaadin-snapshots</id>
@@ -371,6 +382,12 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.sonar-plugins</groupId>
+            <artifactId>maven-report</artifactId>
+            <version>0.1</version>
         </dependency>
 
     </dependencies>

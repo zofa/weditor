@@ -1,9 +1,22 @@
 Manifest-Version: 1.0
+Built-By: z1
+Build-Jdk: 1.7.0_25
 Class-Path: vaadin-6.8.2.jar googleanalyticstracker-2.0.0.jar guava-14
  .0.1.jar refresher-1.1.1.jar commons-io-2.4.jar log4j-1.2.17.jar mysq
  l-connector-java-5.1.6.jar mail-1.4.jar activation-1.1.jar junit-4.8.
- 1.jar
-Build-Jdk: 1.7.0_25
-Built-By: z1
+ 1.jar maven-report-0.1.jar maven-project-2.0.9.jar maven-settings-2.0
+ .9.jar maven-model-2.0.9.jar plexus-utils-1.4.5.jar plexus-container-
+ default-1.0-alpha-9-stable-1.jar classworlds-1.1-alpha-2.jar maven-pr
+ ofile-2.0.9.jar maven-artifact-manager-2.0.9.jar maven-repository-met
+ adata-2.0.9.jar maven-artifact-2.0.9.jar wagon-provider-api-1.0-beta-
+ 2.jar maven-plugin-registry-2.0.9.jar maven-plugin-api-2.0.9.jar doxi
+ a-core-1.0.jar doxia-sink-api-1.0.jar doxia-site-renderer-1.0.jar ple
+ xus-i18n-1.0-beta-7.jar plexus-velocity-1.1.7.jar velocity-1.5.jar co
+ mmons-collections-3.2.jar commons-lang-2.1.jar oro-2.0.8.jar doxia-de
+ coration-model-1.0.jar doxia-module-apt-1.0.jar doxia-module-fml-1.0.
+ jar doxia-module-xdoc-1.0.jar doxia-module-xhtml-1.0.jar maven-report
+ ing-impl-2.0.4.1.jar commons-validator-1.2.0.jar commons-beanutils-1.
+ 7.0.jar commons-logging-1.0.4.jar commons-digester-1.6.jar xml-apis-1
+ .0.b2.jar maven-reporting-api-2.0.9.jar
 Created-By: Apache Maven
 
