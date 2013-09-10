@@ -86,7 +86,9 @@ public class SKUorSageIDOrderEntryFixer implements OrderEntryFixer {
             logger.error(e);
         } finally {
             try {
-                preparedStatement.close();
+                if (preparedStatement == null) {
+                    preparedStatement.close();
+                }
             } catch (SQLException e) {
                 logger.error(e);
             }

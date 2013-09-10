@@ -33,6 +33,15 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 public class WeditorApplication extends Application {
 
+//
+//    public class UiRefresher implements Refresher.RefreshListener {
+//
+//        @Override
+//        public void refresh(Refresher refresher) {
+//            getMainWindow().getApplication().close();
+//        }
+//    }
+
     /**
      *
      */
@@ -272,11 +281,17 @@ public class WeditorApplication extends Application {
 
         mainWindow.setContent(verticalLayout);
 
+//        final Refresher refresher = new Refresher();
+//        refresher.setRefreshInterval(500);
+//        refresher.addListener(new UiRefresher());
+        // addExtension(refresher);
 
         setMainWindow(mainWindow);
-
         //  setMainWindow(new LoginWindow());
+    }
 
+    public void refreshUI() {
+        getMainWindow().getApplication().close();
     }
 
     /**

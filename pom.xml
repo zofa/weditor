@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kraususa</groupId>
     <artifactId>weditor</artifactId>
@@ -27,11 +28,11 @@
         <url>kraususa.com</url>
     </organization>
 
-<!--
-    <prerequisites>
-        <maven>${maven.min-version}</maven>
-    </prerequisites>
--->
+    <!--
+        <prerequisites>
+            <maven>${maven.min-version}</maven>
+        </prerequisites>
+    -->
 
     <issueManagement>
         <system>github</system>
@@ -80,6 +81,7 @@
             <name>Internal Releases</name>
             <url>http://dev-web:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
+
 
         <!--for publishing site to nexus -->
         <site>
@@ -391,6 +393,13 @@
             <groupId>org.codehaus.sonar-plugins</groupId>
             <artifactId>maven-report</artifactId>
             <version>0.1</version>
+        </dependency>
+
+        <!--push mechanism -->
+        <dependency>
+            <groupId>fakepath</groupId>
+            <artifactId>refresher</artifactId>
+            <version>1.2.1.7</version>
         </dependency>
 
     </dependencies>
